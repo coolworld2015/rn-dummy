@@ -138,7 +138,7 @@
 <div id="app">
     <div id="mySidenav" class="sidenav">
         <div style="color: white;margin-top: -48px;margin-left: 12px;font-size: 30px;width: 200px;">
-            Test for WhaleApp by Eduard Tkachuk
+            VU-Dummy
         </div>
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
@@ -167,16 +167,16 @@
 </div>
 
 <script>
-  const appConfig = new Vue();
-  appConfig.route = 'home';
+    const appConfig = new Vue();
+    appConfig.route = 'home';
 
-  const Dummy = {template: '<dummy-items></dummy-items>'};
-  const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
-  const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
-  const DummyAdd = {template: '<dummy-add></dummy-add>'};
+    const Dummy = {template: '<dummy-items></dummy-items>'};
+    const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
+    const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
+    const DummyAdd = {template: '<dummy-add></dummy-add>'};
 
-  Vue.component('top', {
-    template: `<div>
+    Vue.component('top', {
+        template: `<div>
         <div style="float: left; margin: 20px; margin-top: 4px;">
                 <span style="font-size:30px;cursor:pointer; color: black" onclick="openNav()">&#9776;</span>
         </div>
@@ -191,39 +191,39 @@
             </form>
         </div>
         </div>`,
-    data() {
-      return {
-        searchQuery: '',
-      };
-    },
-    methods: {
-      changeView() {
-        appConfig.$emit('searchQuery', this.searchQuery);
-      },
-      searchClear() {
-        this.searchQuery = '';
-        appConfig.$emit('searchQuery', this.searchQuery);
-      },
-    },
-  });
+        data() {
+            return {
+                searchQuery: '',
+            };
+        },
+        methods: {
+            changeView() {
+                appConfig.$emit('searchQuery', this.searchQuery);
+            },
+            searchClear() {
+                this.searchQuery = '';
+                appConfig.$emit('searchQuery', this.searchQuery);
+            },
+        },
+    });
 
-  Vue.component('bottom', {
-    template: `<div>Records: {{count}}</div>`,
-    data() {
-      return {
-        count: 0,
-      };
-    },
-    created() {
-      appConfig.$on('itemsCount', itemsCount => {
-        this.count = itemsCount;
-      });
-    },
-    methods: {},
-  });
+    Vue.component('bottom', {
+        template: `<div>Records: {{count}}</div>`,
+        data() {
+            return {
+                count: 0,
+            };
+        },
+        created() {
+            appConfig.$on('itemsCount', itemsCount => {
+                this.count = itemsCount;
+            });
+        },
+        methods: {},
+    });
 
-  Vue.component('dummy-items-inline', {
-    template: `<div>
+    Vue.component('dummy-items-inline', {
+        template: `<div>
         <div v-if="loading">
             <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
                 <img src="./loading.gif" alt="">
@@ -246,83 +246,83 @@
             Server error - try again
         </div>
       </div>`,
-    data: function() {
-      return {
-        items: [],
-        searchQuery: '',
-        filteredItems: [],
-        loading: true,
-        error: false,
-      };
-    },
-    created() {
-      this.fetchData();
-      appConfig.$on('searchQuery', searchQuery => {
-        let arr = [].concat(appConfig.items);
-        let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-        this.filteredItems = items;
-        this.items = items;
-
-        appConfig.$emit('itemsCount', items.length);
-        if (searchQuery === '') {
-          this.items = appConfig.items;
-          this.filteredItems = appConfig.items;
-        }
-      });
-    },
-    methods: {
-      fetchData() {
-        this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
-          .then(result => {
-            this.items = JSON.parse(result.data);
-            this.filteredItems = JSON.parse(result.data);
-            appConfig.items = this.filteredItems;
-            this.loading = false;
-            appConfig.$emit('itemsCount', this.items.length);
-          })
-          .catch(error => {
-            this.error = true;
-            this.loading = false;
-          });
-      },
-      updateItem(item) {
-        this.loading = true;
-        this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + item.id,
-          {
-            name: item.employee_name,
-            age: item.employee_age,
-            salary: item.employee_salary,
-          })
-          .then(result => {
-            this.loading = true;
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
             this.fetchData();
-          })
-          .catch(error => {
-            this.error = true;
-            //this.loading = false;
-          });
-      },
-      deleteItem(item) {
-        this.loading = true;
-        this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + item.id)
-          .then(result => {
-            this.loading = true;
-            this.fetchData();
-          })
-          .catch(error => {
-            this.error = true;
-            //this.loading = false;
-          });
-      },
-      cancel() {
-        this.loading = true;
-        this.fetchData();
-      },
-    },
-  });
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
 
-  Vue.component('dummy-items', {
-    template: `<div>
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
+                    .then(result => {
+                        this.items = JSON.parse(result.data);
+                        this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            updateItem(item) {
+                this.loading = true;
+                this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + item.id,
+                    {
+                        name: item.employee_name,
+                        age: item.employee_age,
+                        salary: item.employee_salary,
+                    })
+                    .then(result => {
+                        this.loading = true;
+                        this.fetchData();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        //this.loading = false;
+                    });
+            },
+            deleteItem(item) {
+                this.loading = true;
+                this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + item.id)
+                    .then(result => {
+                        this.loading = true;
+                        this.fetchData();
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        //this.loading = false;
+                    });
+            },
+            cancel() {
+                this.loading = true;
+                this.fetchData();
+            },
+        },
+    });
+
+    Vue.component('dummy-items1', {
+        template: `<div>
         <div v-if="loading">
             <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
                 <img src="./loading.gif" alt="">
@@ -337,56 +337,126 @@
             Server error - try again
         </div>
         </div>`,
-    data: function() {
-      return {
-        items: [],
-        searchQuery: '',
-        filteredItems: [],
-        loading: true,
-        error: false,
-      };
-    },
-    created() {
-      this.fetchData();
-      appConfig.$on('searchQuery', searchQuery => {
-        let arr = [].concat(appConfig.items);
-        let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-        this.filteredItems = items;
-        this.items = items;
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.fetchData();
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
 
-        appConfig.$emit('itemsCount', items.length);
-        if (searchQuery === '') {
-          this.items = appConfig.items;
-          this.filteredItems = appConfig.items;
-        }
-      });
-    },
-    methods: {
-      fetchData() {
-        appConfig.message = 'Loading...';
-        this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
-          .then(result => {
-            this.items = JSON.parse(result.data);
-            this.filteredItems = JSON.parse(result.data);
-            appConfig.items = this.filteredItems;
-            this.loading = false;
-            appConfig.$emit('itemsCount', this.items.length);
-          })
-          .catch(error => {
-            this.error = true;
-            this.loading = false;
-          });
-      },
-      showDetails(item) {
-        appConfig.item = item;
-        this.$router.push('item-edit');
-      },
-    },
-  });
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                appConfig.message = 'Loading...';
+                //this.$http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?&tags=coolworld&tagmode=any&format=json')
 
-  Vue.component('dummy-edit', {
-    props: ['item'],
-    template: `<div style="text-align: center;margin-top: 120px;">
+
+                this.$http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?&tags=coolworld&tagmode=any&format=json')
+                    .then(data =>{
+                    console.log(data.json());
+                })
+                /*.then(result => {
+                    console.log(result)
+                    this.items = JSON.parse(result.data);
+                    this.filteredItems = JSON.parse(result.data);
+                    appConfig.items = this.filteredItems;
+                    this.loading = false;
+                    appConfig.$emit('itemsCount', this.items.length);
+                })*/
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('item-edit');
+            },
+        },
+    });
+
+    Vue.component('dummy-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.id }} - {{ item.employee_name }} - {{ item.employee_age }} - {{ item.employee_salary }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
+        },
+        created() {
+            this.fetchData();
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                appConfig.message = 'Loading...';
+                this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
+                    .then(result => {
+                        this.items = JSON.parse(result.data);
+                        this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('item-edit');
+            },
+        },
+    });
+
+    Vue.component('dummy-edit', {
+        props: ['item'],
+        template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
                 {{ title }}
             </div>
@@ -448,114 +518,114 @@
                 Server error - try again
             </div>
         </div>`,
-    data: function() {
-      return {
-        id: '',
-        title: '',
-        employee_name: '',
-        employee_age: '',
-        employee_salary: '',
-        invalidValue: false,
-        error: false,
-        loading: false,
-      };
-    },
-    created() {
-      if (!appConfig.item) {
-        this.$router.push('/home');
-      } else {
-        this.init();
-      }
-    },
-    methods: {
-      init() {
-        this.id = appConfig.item.id;
-        this.title = appConfig.item.employee_name;
-        this.employee_name = appConfig.item.employee_name;
-        this.employee_age = appConfig.item.employee_age;
-        this.employee_salary = appConfig.item.employee_salary;
-        appConfig.$emit('itemsCount', 1);
-      },
-      goBack() {
-        this.$router.push('/home');
-      },
-      updateItem() {
-        if (this.employee_name === '') {
-          this.invalidValue = true;
-        }
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                employee_name: '',
+                employee_age: '',
+                employee_salary: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/home');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                this.id = appConfig.item.id;
+                this.title = appConfig.item.employee_name;
+                this.employee_name = appConfig.item.employee_name;
+                this.employee_age = appConfig.item.employee_age;
+                this.employee_salary = appConfig.item.employee_salary;
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/home');
+            },
+            updateItem() {
+                if (this.employee_name === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.employee_age === '') {
-          this.invalidValue = true;
-        }
+                if (this.employee_age === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.employee_salary === '') {
-          this.invalidValue = true;
-        }
+                if (this.employee_salary === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.invalidValue) {
-          return;
-        }
+                if (this.invalidValue) {
+                    return;
+                }
 
-        this.loading = true;
-        this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + this.id,
-          {
-            name: this.employee_name,
-            age: this.employee_age,
-            salary: this.employee_salary,
-          })
-          .then(result => {
-            this.$router.push('/home');
-          })
-          .catch(error => {
-            this.error = true;
-            this.loading = false;
-          });
-      },
-      deleteItem() {
-        this.loading = true;
-        this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + this.id)
-          .then(result => {
-            this.$router.push('/home');
-          })
-          .catch(error => {
-            this.error = true;
-            this.loading = false;
-          });
-      },
-      clearWarning() {
-        this.invalidValue = false;
-      },
-    },
-  });
+                this.loading = true;
+                this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + this.id,
+                    {
+                        name: this.employee_name,
+                        age: this.employee_age,
+                        salary: this.employee_salary,
+                    })
+                    .then(result => {
+                        this.$router.push('/home');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            deleteItem() {
+                this.loading = true;
+                this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + this.id)
+                    .then(result => {
+                        this.$router.push('/home');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
 
-  Vue.component('dummy-add', {
-    props: ['item'],
-    template: `<div style="text-align: center;margin-top: 120px;">
+    Vue.component('dummy-add', {
+        props: ['item'],
+        template: `<div style="text-align: center;margin-top: 120px;">
         <div style="font-size: 40px;
                         color: black;
                         font-weight: bolder;
                         margin: 20px;">New record</div>
 
-            <span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 40px;"
+            width: 450px;outline:none;margin-right: 0px;"
             placeholder="Name"
             v-on:keypress="clearWarning"
             v-model="employee_name" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>
+            <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 40px;"
+            width: 450px;outline:none;margin-right: 0px;"
             placeholder="Age"
             v-on:keypress="clearWarning"
             v-model="employee_age" ><br>
 
-            <span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
             border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
-            width: 450px;outline:none;margin-right: 40px;"
+            width: 450px;outline:none;margin-right: 0px;"
             placeholder="Salary"
             v-on:keypress="clearWarning"
             v-model="employee_salary"><br>
@@ -590,109 +660,108 @@
                 Server error - try again
             </div>
         </div>`,
-    data: function() {
-      return {
-        id: '',
-        title: '',
-        employee_name: '',
-        employee_age: '',
-        employee_salary: '',
-        invalidValue: false,
-        error: false,
-        loading: false,
-      };
-    },
-    created() {
-      this.init();
-    },
-    methods: {
-      init() {
-        appConfig.$emit('itemsCount', 1);
-      },
-      goBack() {
-        this.$router.push('/home');
-      },
-      addItem() {
-        if (this.employee_name === '') {
-          this.invalidValue = true;
-        }
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                employee_name: '',
+                employee_age: '',
+                employee_salary: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/home');
+            },
+            addItem() {
+                if (this.employee_name === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.employee_age === '') {
-          this.invalidValue = true;
-        }
+                if (this.employee_age === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.employee_salary === '') {
-          this.invalidValue = true;
-        }
+                if (this.employee_salary === '') {
+                    this.invalidValue = true;
+                }
 
-        if (this.invalidValue) {
-          return;
-        }
+                if (this.invalidValue) {
+                    return;
+                }
 
-        this.loading = true;
-        this.$http.post('http://dummy.restapiexample.com/api/v1/create',
-          {
-            name: this.employee_name,
-            age: this.employee_age,
-            salary: this.employee_salary,
-          })
-          .then(result => {
-            this.$router.push('/home');
-          })
-          .catch(error => {
-            this.error = true;
-            this.loading = false;
-          });
-      },
-      clearWarning() {
-        this.invalidValue = false;
-      },
-    },
-  });
+                this.loading = true;
+                this.$http.post('http://dummy.restapiexample.com/api/v1/create',
+                    {
+                        name: this.employee_name,
+                        age: this.employee_age,
+                        salary: this.employee_salary,
+                    })
+                    .then(result => {
+                        this.$router.push('/home');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
 
-  const routes = [
-    {path: '/', component: Dummy},
-    {path: '/home', component: Dummy},
-    {path: '/inline', component: DummyInline},
-    {path: '/item-edit', component: DummyEdit},
-    {path: '/item-add', component: DummyAdd},
-  ];
+    const routes = [
+        {path: '/', component: Dummy},
+        {path: '/home', component: Dummy},
+        {path: '/inline', component: DummyInline},
+        {path: '/item-edit', component: DummyEdit},
+        {path: '/item-add', component: DummyAdd},
+    ];
 
-  const router = new VueRouter({
-    routes,
-  });
+    const router = new VueRouter({
+        routes,
+    });
 
-  new Vue({
-    el: '#app',
-    router,
-    data: {},
-    created() {
-      this.init();
-    },
-    methods: {
-      init() {
-        this.home = appConfig.route === 'home';
-        this.inline = appConfig.route === 'inline';
-        this.add = appConfig.route === 'item-add';
-      },
-      changeRoute(route) {
-        closeNav();
-        appConfig.route = route;
-        this.init();
-        this.$router.push('/' + route);
+    new Vue({
+        el: '#app',
+        router,
+        data: {},
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                this.home = appConfig.route === 'home';
+                this.inline = appConfig.route === 'inline';
+                this.add = appConfig.route === 'item-add';
+            },
+            changeRoute(route) {
+                closeNav();
+                appConfig.route = route;
+                this.init();
+                this.$router.push('/' + route);
+                return false;
+            },
+        },
+    });
+
+    function openNav() {
+        document.getElementById('mySidenav').style.width = '250px';
+    }
+
+    function closeNav() {
+        document.getElementById('mySidenav').style.width = '0';
         return false;
-      },
-    },
-  });
-
-  function openNav() {
-    document.getElementById('mySidenav').style.width = '250px';
-  }
-
-  function closeNav() {
-    document.getElementById('mySidenav').style.width = '0';
-    return false;
-  }
+    }
 </script>
 
- 

@@ -29,6 +29,8 @@ target 'rnBase' do
 
   pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
+  pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
+
   target 'rnBaseTests' do
     inherit! :search_paths
     # Pods for testing
