@@ -8,7 +8,8 @@ import {
     Dimensions,
     ActivityIndicator,
     ScrollView,
-    RefreshControl
+    Alert,
+    KeyboardAvoidingView
 } from 'react-native';
 
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
@@ -18,14 +19,24 @@ class Chat extends Component {
     constructor(props) {
         super(props);
 
-        /*        PushNotificationIOS.configure({
-                    onRegister: function(token) {
-                        console.log( 'TOKEN:', token );
-                    },
-                    onNotification: function(notification) {
-                        console.log( 'NOTIFICATION:', notification );
-                    }
-                })*/
+
+        /*
+                PushNotificationIOS.addEventListener('register', (token) => {
+                    Alert.alert('You are registered and the device token is: ', token)
+                });
+
+                PushNotificationIOS.addEventListener('notification', (notification) => {
+                    Alert.alert('You have received a new notification!', notification);
+                });
+
+                PushNotificationIOS.addEventListener('localNotification', (notification) => {
+                    Alert.alert('You have received a new notification!', notification);
+                });
+
+                PushNotificationIOS.addEventListener('registrationError', (notification) => {
+                    Alert.alert('You have received a new notification!', notification);
+                });
+        */
 
         this.state = {
             messages: [],
@@ -35,12 +46,15 @@ class Chat extends Component {
             width: Dimensions.get('window').width
         };
 
-        //appConfig.socket.name = 'Ed';
+        if (!appConfig.socket.name) {
+            appConfig.socket.name = 'Ed';
+        }
 
         ws = new WebSocket('wss://jwt-chat.herokuapp.com');
 
         ws.onerror = (e) => {
-            this.message = 'error'
+            this.message = 'error';
+            window.appConfig.onLogOut();
         };
 
         ws.onopen1 = () => {
@@ -71,21 +85,52 @@ class Chat extends Component {
                 showProgress: false
             });
 
-            if (messageObject.split('###')[0] != 'still alive' && appConfig.socket.name != messageObject.split('###')[1]) {
-                PushNotificationIOS.localNotificationSchedule({
+            if (messageObject.split('###')[0] !== 'still alive' && appConfig.socket.name !== messageObject.split('###')[1]) {
+                let message = messageObject.split('###')[1] + ': ' + messageObject.split('###')[0];
+                //Alert.alert('Message: ', message)
+                PushNotificationIOS.presentLocalNotification({
+                    alertBody: 'Hello notification'
+                })
+                /*PushNotificationIOS.localNotificationSchedule({
                     //message: "New Message", // (required)
                     message: messageObject.split('###')[1] + ': ' + messageObject.split('###')[0],
                     date: new Date(Date.now() + (0 * 1000)) // in 60 secs
-                });
+                });*/
             }
         };
     }
 
     componentDidMount() {
-        this.setState({
-            width: Dimensions.get('window').width
+        PushNotificationIOS.checkPermissions((token) => {
+            if (token.alert == 0) {
+                PushNotificationIOS.requestPermissions();
+            }
         });
+
+        PushNotificationIOS.addEventListener('register', (token) => {
+            Alert.alert('You are registered and the device token is: ', token)
+        });
+
+        PushNotificationIOS.addEventListener('notification', (notification) => {
+            Alert.alert('You have received a new notification!', notification);
+        });
+
+        PushNotificationIOS.addEventListener('localNotification', (notification) => {
+            Alert.alert('You have received a new notification!', notification);
+        });
+
+        PushNotificationIOS.addEventListener('registrationError', (notification) => {
+            Alert.alert('You have received a new notification!', notification);
+        });
+
         this.getItems();
+    }
+
+    componentWillUnmount() {
+        PushNotificationIOS.removeEventListener('register', (token) => {});
+        PushNotificationIOS.removeEventListener('notification', (token) => {});
+        PushNotificationIOS.removeEventListener('localNotification', (token) => {});
+        PushNotificationIOS.removeEventListener('registrationError', (token) => {});
     }
 
     getItems() {
@@ -121,6 +166,7 @@ class Chat extends Component {
                 this.setState({
                     serverError: true
                 });
+                window.appConfig.onLogOut();
             })
             .finally(() => {
                 this.setState({
@@ -163,8 +209,22 @@ class Chat extends Component {
             return;
         }
 
+        if (event.nativeEvent.contentOffset.y <= -100) {
+            this.setState({
+                showProgress: true,
+                resultsCount: 0,
+                recordsCount: 25,
+                positionY: 0,
+                searchQuery: ''
+            });
+
+            setTimeout(() => {
+                this.getItems();
+            }, 300);
+        }
+
         if (this.state.filteredItems === undefined) {
-            return;
+            //return;
         }
 
         let items, positionY, recordsCount;
@@ -217,98 +277,84 @@ class Chat extends Component {
         }
 
         if (this.state.showProgress) {
-            loader = <View style={{
-                justifyContent: 'center',
-                height: 100
-            }}>
+            loader = <View style={styles.loader}>
                 <ActivityIndicator
-                    animating={this.state.showProgress}
                     size="large"
                     color="darkblue"
-                    style={styles.loader}
+                    animating={true}
                 />
             </View>;
         }
 
         return (
             <View style={styles.container}>
-                <View style={{
-                    flex: 1,
-                    backgroundColor: 'whitesmoke',
-                    borderColor: '#48BBEC',
-                    //borderRadius: 5,
-                    //borderWidth: 5
-                }}>
-                    <ScrollView onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}
-                                refreshControl={
-                                    <RefreshControl
-                                        enabled={true}
-                                        refreshing={this.state.refreshing}
-                                        onRefresh={this.refreshDataAndroid.bind(this)}
-                                    />
-                                }
-                    >
-                        {loader}
-                        {this.showMessages()}
-                    </ScrollView>
-                </View>
-
-                <View style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: 'whitesmoke',
-                    borderColor: '#48BBEC',
-                    //borderRadius: 5,
-                    //borderWidth: 5,
-                    height: 170
-                }}>
-                    <View>
-                        <TextInput
-                            underlineColorAndroid='rgba(0,0,0,0)'
-                            onChangeText={(text) => this.setState({
-                                messageText: text,
-                                invalidValue: false
-                            })}
-                            value={this.state.messageText}
-                            style={{
-                                height: 50,
-                                width: this.state.width * .95,
-                                marginTop: -20,
-                                padding: 4,
-                                fontSize: 18,
-                                borderWidth: 1,
-                                borderColor: 'lightgray',
-                                borderRadius: 5,
-                                color: 'black',
-                                backgroundColor: 'white'
-                            }}
-                            placeholder='Message'>
-                        </TextInput>
-
+                <KeyboardAvoidingView behavior="padding" enabled>
+                    <View style={{
+                        flex: 1,
+                        backgroundColor: 'whitesmoke',
+                        borderColor: '#48BBEC',
+                    }}>
+                        <ScrollView onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
+                            {loader}
+                            {this.showMessages()}
+                        </ScrollView>
                     </View>
 
-                    <View>
-                        <TouchableHighlight
-                            onPress={() => this.goSend()}
-                            style={{
-                                height: 50,
-                                width: this.state.width * .95,
-                                //backgroundColor: '#48BBEC',
-                                backgroundColor: 'darkblue',
-                                borderColor: '#48BBEC',
-                                alignSelf: 'stretch',
-                                marginTop: 20,
-                                margin: 5,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderRadius: 5
-                            }}>
-                            <Text style={styles.buttonText}>
-                                Send
-                            </Text>
-                        </TouchableHighlight>
+                    <View style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'whitesmoke',
+                        borderColor: '#48BBEC',
+                        height: 170
+                    }}>
+                        <View>
+                            <TextInput
+                                underlineColorAndroid='rgba(0,0,0,0)'
+                                onChangeText={(text) => this.setState({
+                                    messageText: text,
+                                    invalidValue: false
+                                })}
+                                value={this.state.messageText}
+                                style={{
+                                    height: 50,
+                                    width: this.state.width * .95,
+                                    marginTop: -20,
+                                    padding: 4,
+                                    fontSize: 18,
+                                    borderWidth: 1,
+                                    borderColor: 'lightgray',
+                                    borderRadius: 5,
+                                    color: 'black',
+                                    backgroundColor: 'white'
+                                }}
+                                onSubmitEditing={() => this.goSend()}
+                                placeholder='Message'>
+                            </TextInput>
+
+                        </View>
+
+                        <View>
+                            <TouchableHighlight
+                                onPress={() => this.goSend()}
+                                style={{
+                                    height: 50,
+                                    width: this.state.width * .95,
+                                    backgroundColor: 'darkblue',
+                                    borderColor: '#48BBEC',
+                                    alignSelf: 'stretch',
+                                    marginTop: 20,
+                                    margin: 5,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderRadius: 5
+                                }}>
+                                <Text style={styles.buttonText}>
+                                    Send
+                                </Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             </View>
         );
     }
@@ -357,7 +403,11 @@ const styles = StyleSheet.create({
         color: 'red',
         paddingTop: 10,
         textAlign: 'center'
-    }
+    },
+    loader: {
+        justifyContent: 'center',
+        height: 100
+    },
 });
 
 export default Chat;

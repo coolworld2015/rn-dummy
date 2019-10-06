@@ -151,13 +151,13 @@
         </ul>
     </div>
 
-    <div class="top">
+    <!--<div class="top">
         <top></top>
-    </div>
+    </div>-->
 
-    <div class="bottom">
+    <!--<div class="bottom">
         <bottom></bottom>
-    </div>
+    </div>-->
 
     <div id="main">
         <div class="middle">
@@ -170,7 +170,12 @@
     const appConfig = new Vue();
     appConfig.route = 'home';
 
-    const Dummy = {template: '<dummy-items></dummy-items>'};
+    const Dummy = {template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                            <dummy-items></dummy-items>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`};
     const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
     const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
     const DummyAdd = {template: '<dummy-add></dummy-add>'};

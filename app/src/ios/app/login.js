@@ -10,7 +10,8 @@ import {
     ScrollView,
     ActivityIndicator,
     TextInput,
-    Dimensions
+    Dimensions,
+    KeyboardAvoidingView
 } from 'react-native';
 
 class Login extends Component {
@@ -19,8 +20,8 @@ class Login extends Component {
 
         this.state = {
             showProgress: false,
-            username: '',
-            password: '',
+            username: '1',
+            password: '1',
             bugANDROID: '',
             width: Dimensions.get('window').width
         }
@@ -99,6 +100,7 @@ class Login extends Component {
 
         return (
             <ScrollView style={{backgroundColor: 'whitesmoke'}} keyboardShouldPersistTaps='always'>
+                <KeyboardAvoidingView behavior="padding" enabled>
                 <View style={styles.container}>
 
                     <View style={styles.headerContainer}>
@@ -175,6 +177,7 @@ class Login extends Component {
 
                     <Text>{this.state.bugANDROID}</Text>
                 </View>
+                </KeyboardAvoidingView>
             </ScrollView>
         )
     }
