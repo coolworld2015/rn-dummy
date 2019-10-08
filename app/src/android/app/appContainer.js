@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 
 import {
-  createStackNavigator,
-  createAppContainer,
-  createMaterialTopTabNavigator,
+    createStackNavigator,
+    createAppContainer,
+    createMaterialTopTabNavigator,
 } from 'react-navigation';
 
 import {StackViewStyleInterpolator} from 'react-navigation-stack';
@@ -12,64 +12,78 @@ import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
+import Chat from '../chat/chat';
+
 const UsersTab = createStackNavigator({
-    Users,
-    UserDetails,
-    UserAdd,
-  }, {
-    headerMode: 'none',
-    transitionConfig: () => ({
-      screenInterpolator: sceneProps => {
-        return StackViewStyleInterpolator.forHorizontal(sceneProps);
-      },
-    }),
-  },
+        Users,
+        UserDetails,
+        UserAdd,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
 );
 
+const ChatTab = createStackNavigator({
+        Chat,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
 
 class Logout extends Component {
-  constructor(props) {
-    super(props);
-  }
+    constructor(props) {
+        super(props);
+    }
 
-  componentDidMount() {
-    this.didFocusListener = this.props.navigation.addListener(
-      'didFocus',
-      () => {
-        this.quitComponent();
-      },
-    );
-  }
+    componentDidMount() {
+        this.didFocusListener = this.props.navigation.addListener(
+            'didFocus',
+            () => {
+                this.quitComponent();
+            },
+        );
+    }
 
-  quitComponent() {
-    //appConfig.onLogOut();
-  }
+    quitComponent() {
+        appConfig.onLogOut();
+    }
 
-  render() {
-    return null;
-  }
+    render() {
+        return null;
+    }
 }
 
 const tabBarOptions = {
-  style: {
-    backgroundColor: 'white',
-  },
-  labelStyle: {
-    color: 'darkblue',
-    fontWeight: 'bold',
-  },
-  upperCaseLabel: false,
-  indicatorStyle: {backgroundColor: 'darkblue'},
+    style: {
+        backgroundColor: 'white',
+    },
+    labelStyle: {
+        color: 'darkblue',
+        fontWeight: 'bold',
+    },
+    upperCaseLabel: false,
+    indicatorStyle: {backgroundColor: 'darkblue'},
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
-    Dummy: UsersTab,
-    Quit: Logout,
-  },
-  {
-    tabBarPosition: 'top',
-    tabBarOptions,
-  },
+        Chat: ChatTab,
+        Dummy: UsersTab,
+        Quit: Logout,
+    },
+    {
+        tabBarPosition: 'top',
+        tabBarOptions,
+    },
 );
 
 export default createAppContainer(TabNavigator);

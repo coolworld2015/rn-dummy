@@ -19,25 +19,6 @@ class Chat extends Component {
     constructor(props) {
         super(props);
 
-
-        /*
-                PushNotificationIOS.addEventListener('register', (token) => {
-                    Alert.alert('You are registered and the device token is: ', token)
-                });
-
-                PushNotificationIOS.addEventListener('notification', (notification) => {
-                    Alert.alert('You have received a new notification!', notification);
-                });
-
-                PushNotificationIOS.addEventListener('localNotification', (notification) => {
-                    Alert.alert('You have received a new notification!', notification);
-                });
-
-                PushNotificationIOS.addEventListener('registrationError', (notification) => {
-                    Alert.alert('You have received a new notification!', notification);
-                });
-        */
-
         this.state = {
             messages: [],
             filteredItems: [],

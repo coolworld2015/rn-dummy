@@ -1,21 +1,17 @@
 import React from 'react';
+import {Image} from 'react-native';
+
 import {createBottomTabNavigator, createStackNavigator, createAppContainer} from 'react-navigation';
+import {StackViewStyleInterpolator} from 'react-navigation-stack';
 
 import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
 import Chat from '../chat/chat';
-//import Chat from '../chat/test';
-
-import {Image} from 'react-native';
-
-import {StackViewStyleInterpolator} from 'react-navigation-stack';
 
 const ChatTab = createStackNavigator({
         Chat,
-        UserDetails,
-        UserAdd,
     }, {
         headerMode: 'none',
         transitionConfig: () => ({
