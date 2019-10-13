@@ -90,8 +90,17 @@ class Login extends Component {
     }
 
     render() {
-        let errorCtrl;
+        let loader, errorCtrl;
 
+        if (this.state.showProgress) {
+            loader = <View style={styles.loader}>
+                <ActivityIndicator
+                    size="large"
+                    color="darkblue"
+                    animating={true}
+                />
+            </View>;
+        }
         if (this.state.badCredentials) {
             errorCtrl = <Text style={styles.error}>
                 That username and password combination did not work
@@ -168,14 +177,8 @@ class Login extends Component {
 
                     {errorCtrl}
 
-                    <ActivityIndicator
-                        animating={this.state.showProgress}
-                        size="large"
-						color="darkblue"
-                        style={styles.loader}
-                    />
+                    {loader}
 
-                    <Text>{this.state.bugANDROID}</Text>
                 </View>
                 </KeyboardAvoidingView>
             </ScrollView>
