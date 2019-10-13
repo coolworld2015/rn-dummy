@@ -170,12 +170,24 @@
     const appConfig = new Vue();
     appConfig.route = 'home';
 
-    const Dummy = {template: `
+    const Phones = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                            <phones-items></phones-items>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
+    const PhoneShow = {template: '<phone-show></phone-show>'};
+
+    const Dummy = {
+        template: `
                     <div>
                         <div class="top"><top></top></div>
                             <dummy-items></dummy-items>
                         <div class="bottom"><bottom></bottom></div>
-                    </div>`};
+                    </div>`
+    };
     const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
     const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
     const DummyAdd = {template: '<dummy-add></dummy-add>'};
@@ -373,17 +385,17 @@
 
 
                 this.$http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?&tags=coolworld&tagmode=any&format=json')
-                    .then(data =>{
-                    console.log(data.json());
-                })
-                /*.then(result => {
-                    console.log(result)
-                    this.items = JSON.parse(result.data);
-                    this.filteredItems = JSON.parse(result.data);
-                    appConfig.items = this.filteredItems;
-                    this.loading = false;
-                    appConfig.$emit('itemsCount', this.items.length);
-                })*/
+                    .then(data => {
+                        console.log(data.json());
+                    })
+                    /*.then(result => {
+                        console.log(result)
+                        this.items = JSON.parse(result.data);
+                        this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })*/
                     .catch(error => {
                         this.error = true;
                         this.loading = false;
@@ -725,12 +737,174 @@
         },
     });
 
+    Vue.component('phones-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.name }} - {{ item.phone }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            }
+        },
+        created() {
+            this.fetchData();
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                appConfig.message = 'Loading...';
+                this.$http.get('https://ui-base.herokuapp.com/api/items/get')
+                    .then(result => {
+                        this.items = result.data;
+                        this.filteredItems = result.data;
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('phone-show');
+            },
+        }
+    });
+
+    Vue.component('phone-show', {
+        props: ['item'],
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
+                {{ title }}
+            </div>
+
+            <span style="font-size: 24px; color: black;"></span>
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            v-model="id"><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-model="name" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Age"
+            v-on:keypress="clearWarning"
+            v-model="phone" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="address" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="index" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">
+                Back
+            </button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="margin-top: 25px;">
+                Server error - try again
+            </div>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                name: '',
+                phone: '',
+                address: '',
+                index: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/home');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                this.id = appConfig.item.id;
+                this.title = appConfig.item.name;
+                this.name = appConfig.item.name;
+                this.phone = appConfig.item.phone;
+                this.index = appConfig.item.index;
+                this.address = appConfig.item.street + ' ' + appConfig.item.house + ', Apt. ' + appConfig.item.apt;
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/home');
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
+
     const routes = [
-        {path: '/', component: Dummy},
-        {path: '/home', component: Dummy},
+        {path: '/', component: Phones},
+        {path: '/home', component: Phones},
         {path: '/inline', component: DummyInline},
         {path: '/item-edit', component: DummyEdit},
         {path: '/item-add', component: DummyAdd},
+        {path: '/phones', component: Phones},
+        {path: '/phone-show', component: PhoneShow},
     ];
 
     const router = new VueRouter({
