@@ -31,6 +31,8 @@ target 'rnBase' do
 
   pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
   target 'rnBaseTests' do
     inherit! :search_paths
     # Pods for testing

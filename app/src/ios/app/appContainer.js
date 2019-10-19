@@ -10,6 +10,8 @@ import UserAdd from '../users/userAdd';
 
 import Chat from '../chat/chat';
 
+import Map from '../map/map';
+
 const ChatTab = createStackNavigator({
         Chat,
     }, {
@@ -36,6 +38,18 @@ const UsersTab = createStackNavigator({
     },
 );
 
+const MapTab = createStackNavigator({
+        Map
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
 class Quit extends React.Component {
     render() {
         window.appConfig.onLogOut();
@@ -44,8 +58,9 @@ class Quit extends React.Component {
 }
 
 const TabNavigator = createBottomTabNavigator({
-        Chat: ChatTab,
+        Map: MapTab,
         Dummy: UsersTab,
+        Chat: ChatTab,
         Quit: Quit
     },
     {
@@ -67,6 +82,16 @@ const TabNavigator = createBottomTabNavigator({
                 if (routeName === 'Dummy') {
                     iconName = <Image
                         source={require('../../../img/clock.png')}
+                        style={{
+                            height: 20,
+                            width: 20,
+                            margin: 0,
+                        }}
+                    />;
+                }
+                if (routeName === 'Map') {
+                    iconName = <Image
+                        source={require('../../../img/images.png')}
                         style={{
                             height: 20,
                             width: 20,

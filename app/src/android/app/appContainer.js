@@ -14,10 +14,24 @@ import UserAdd from '../users/userAdd';
 
 import Chat from '../chat/chat';
 
+import Map from '../map/map';
+
 const UsersTab = createStackNavigator({
         Users,
         UserDetails,
         UserAdd,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
+const MapTab = createStackNavigator({
+        Map
     }, {
         headerMode: 'none',
         transitionConfig: () => ({
@@ -76,6 +90,7 @@ const tabBarOptions = {
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
+        Map: MapTab,
         Chat: ChatTab,
         Dummy: UsersTab,
         Quit: Logout,
