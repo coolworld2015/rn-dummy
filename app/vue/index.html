@@ -2,8 +2,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 
-<script src="http://maps.google.com/maps/api/js?sensor=false"
-        type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -152,10 +151,12 @@
                 <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Add</span></li>
             <li v-on:click="changeRoute('inline')" v-bind:class="{ active: inline }">
                 <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Inline</span></li>
+            <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
+                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Map</span></li>
         </ul>
     </div>
 
-    <!--<div class="top">
+<!--    <div class="top">
         <top></top>
     </div>-->
 
@@ -164,10 +165,8 @@
     </div>-->
 
     <div id="main">
-        <div class="middle">
-            <div id="map">
+        <div class="middle" id="map">
             <router-view></router-view>
-            </div>
         </div>
     </div>
 </div>
@@ -179,10 +178,10 @@
 
     const GoogleMap = {
         template: `
-                    <div id="map">
+                    <div>
                         <div class="top"><top></top></div>
                             <google-map></google-map>
-                        <div class="bottom"><bottom></bottom></div>
+
                     </div>`
     };
 
@@ -209,24 +208,28 @@
     const DummyAdd = {template: '<dummy-add></dummy-add>'};
 
     Vue.component('googleMap', {
-        template: `
-         <div>
-
-
-    <div id="map1"></div>
-  </div>
-        `,
+        template: '<div></div>',
         data() {
             return {map:''};
         },
         created() {
-             this.map = new google.maps.Map(document.getElementById('map1'), {
+             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 15,
                 center: new google.maps.LatLng(49.5443047, 31.8691583),
                 mapTypeId: google.maps.MapTypeId.ROADMAP
                 //mapTypeId: google.maps.MapTypeId.SATELLITE
             });
 
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(49.5443047, 31.8691583),
+                draggable: true,
+                //animation: google.maps.Animation.BOUNCE,
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 5
+                },
+                map: map
+            });
         },
         methods: {
         },
@@ -962,6 +965,7 @@
         methods: {
             init() {
                 this.home = appConfig.route === 'home';
+                this.map = appConfig.route === 'map';
                 this.inline = appConfig.route === 'inline';
                 this.add = appConfig.route === 'item-add';
             },
