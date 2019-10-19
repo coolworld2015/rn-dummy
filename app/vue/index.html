@@ -150,22 +150,22 @@
             <li v-on:click="changeRoute('item-add')" v-bind:class="{ active: add }">
                 <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Add</span></li>
             <li v-on:click="changeRoute('inline')" v-bind:class="{ active: inline }">
-                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Inline</span></li>
+                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Inline</span></li>
             <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
-                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Map</span></li>
+                <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
         </ul>
     </div>
 
-<!--    <div class="top">
-        <top></top>
-    </div>-->
+    <!--    <div class="top">
+            <top></top>
+        </div>-->
 
     <!--<div class="bottom">
         <bottom></bottom>
     </div>-->
 
     <div id="main">
-        <div class="middle" id="map">
+        <div class="middle">
             <router-view></router-view>
         </div>
     </div>
@@ -180,8 +180,7 @@
         template: `
                     <div>
                         <div class="top"><top></top></div>
-                            <google-map></google-map>
-
+                        <div style="margin-top: 96px;"><google-map></google-map></div>
                     </div>`
     };
 
@@ -208,30 +207,87 @@
     const DummyAdd = {template: '<dummy-add></dummy-add>'};
 
     Vue.component('googleMap', {
-        template: '<div></div>',
+        template: '<div class="middle" id="map"></div>',
         data() {
-            return {map:''};
+            return {
+                map: '',
+                symbolOne: {
+                    path: 'M -2,0 0,-2 2,0 0,2 z',
+                    strokeColor: 'gold',
+                    fillColor: 'gold',
+                    fillOpacity: 1,
+                    scale: 3,
+                },
+                image: '../img/blue-circle.png',
+                locations: [
+                    ['<div style1="margin: 0px; background: #00FFFF; "><img src="resort2_1.jpg" style="margin: 15px; width: 200px"><br><b>Перлина Резорт</b></div>', 49.093086, 8.533068, 1],
+                    ['А это - ЛЕС', 49.147995, 8.559998, 2],
+                    ['А это - <b>ПЛАВНИ</b>', 49.116544, 8.551161, 3]
+                ],
+                flightPath: new google.maps.Polyline({
+                    path: [
+                        {lat: 49.093086, lng: 8.533068},
+                        {lat: 49.106580, lng: 8.544306},
+                        {lat: 49.116544, lng: 8.551161},
+                        {lat: 49.128808, lng: 8.550718},
+                        {lat: 49.133488, lng: 8.551667},
+                        {lat: 49.147995, lng: 8.559998},
+                    ],
+                    geodesic: true,
+                    strokeColor: '#01579B',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 6
+                })
+            }
         },
         created() {
-             map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 15,
-                center: new google.maps.LatLng(49.5443047, 31.8691583),
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-                //mapTypeId: google.maps.MapTypeId.SATELLITE
-            });
-
-            marker = new google.maps.Marker({
-                position: new google.maps.LatLng(49.5443047, 31.8691583),
-                draggable: true,
-                //animation: google.maps.Animation.BOUNCE,
-                icon: {
-                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                    scale: 5
-                },
-                map: map
-            });
+            setTimeout(this.init, 500);
         },
         methods: {
+            init() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 13,
+                    center: new google.maps.LatLng(49.124966, 8.552490),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    //mapTypeId: google.maps.MapTypeId.SATELLITE
+                });
+
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(49.124966, 8.552490),
+                    draggable: true,
+                    //animation: google.maps.Animation.BOUNCE,
+                    /*icon: {
+                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                        scale: 5
+                    },*/
+                    //icon: this.symbolOne,
+                    icon: this.image,
+                    map: map
+                });
+
+
+                this.setPoints()
+                this.showRoutes()
+            },
+            setPoints() {
+                for (var i = 0; i < this.locations.length; i++) {
+                    this.marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
+                        map: map
+                    });
+                    var infowindow = new google.maps.InfoWindow()
+
+                    google.maps.event.addListener(this.marker, 'click', (function (marker, i) {
+                        return function () {
+                            infowindow.setContent(this.locations[i][0]);
+                            infowindow.open(map, marker);
+                        }
+                    })(marker, i));
+                }
+            },
+            showRoutes() {
+                this.flightPath.setMap(map);
+            }
         },
     });
 
