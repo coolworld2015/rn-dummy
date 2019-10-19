@@ -2,6 +2,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.min.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 
+<script src="http://maps.google.com/maps/api/js?sensor=false"
+        type="text/javascript"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <style>
@@ -52,7 +55,8 @@
         position: fixed;
         bottom: 0px;
         width: 100%;
-        background: red;
+        /*background: red;*/
+        background: #01579B;
         padding: 5px;
         height: 40px;
         color: white;
@@ -161,14 +165,26 @@
 
     <div id="main">
         <div class="middle">
+            <div id="map">
             <router-view></router-view>
+            </div>
         </div>
     </div>
+</div>
 </div>
 
 <script>
     const appConfig = new Vue();
     appConfig.route = 'home';
+
+    const GoogleMap = {
+        template: `
+                    <div id="map">
+                        <div class="top"><top></top></div>
+                            <google-map></google-map>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
 
     const Phones = {
         template: `
@@ -191,6 +207,30 @@
     const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
     const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
     const DummyAdd = {template: '<dummy-add></dummy-add>'};
+
+    Vue.component('googleMap', {
+        template: `
+         <div>
+
+
+    <div id="map1"></div>
+  </div>
+        `,
+        data() {
+            return {map:''};
+        },
+        created() {
+             this.map = new google.maps.Map(document.getElementById('map1'), {
+                zoom: 15,
+                center: new google.maps.LatLng(49.5443047, 31.8691583),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+                //mapTypeId: google.maps.MapTypeId.SATELLITE
+            });
+
+        },
+        methods: {
+        },
+    });
 
     Vue.component('top', {
         template: `<div>
@@ -520,7 +560,7 @@
                 Delete
             </button><br>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;margin-top: 20px;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">
                 Back
             </button>
@@ -655,7 +695,7 @@
                             height: 50px;
                             width: 150px;
                             border-radius: 5px;
-                            background: red;
+                            background: #01579B;
                             color: white;outline:none;"
             v-on:click="addItem">Submit</button>
 
@@ -663,7 +703,7 @@
                             height: 50px;
                             width: 150px;
                             border-radius: 5px;
-                            background: red;
+                            background: #01579B;
                             color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">Back</button>
 
@@ -843,7 +883,7 @@
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
             </div>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;margin-top: 20px;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
             v-on:click="goBack">
                 Back
             </button>
@@ -905,6 +945,7 @@
         {path: '/item-add', component: DummyAdd},
         {path: '/phones', component: Phones},
         {path: '/phone-show', component: PhoneShow},
+        {path: '/map', component: GoogleMap},
     ];
 
     const router = new VueRouter({
