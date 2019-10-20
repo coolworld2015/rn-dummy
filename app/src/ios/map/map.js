@@ -7,9 +7,6 @@ import {
     View,
     TouchableHighlight,
     TouchableWithoutFeedback,
-    ScrollView,
-    ActivityIndicator,
-    TextInput,
     Dimensions,
     Image,
 } from 'react-native';
@@ -21,7 +18,7 @@ class Map extends Component {
         super(props);
 
         this.state = {
-            html: 'https://www.google.com.ua/maps/place/%D0%9F%D0%B5%D1%80%D0%BB%D0%B8%D0%BD%D0%B0+%D0%A0%D0%B5%D0%B7%D0%BE%D1%80%D1%82/@49.5443458,31.8516129,14z/data=!4m5!3m4!1s0x0:0xef0027af01f2c984!8m2!3d49.5443458!4d31.8691224?hl=ru'
+            key: 0,
         };
 
         //window.navigator.geolocation.requestAuthorization();
@@ -32,7 +29,7 @@ class Map extends Component {
     }
 
     render() {
-        var html = `
+        let html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -168,7 +165,9 @@ class Map extends Component {
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View>
-                        <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                        <TouchableWithoutFeedback onPress={()=> {this.setState({
+                            key: this.state.key + 1
+                        })}}>
                             <View>
                                 <Image
                                     style={styles.menu}
@@ -188,7 +187,6 @@ class Map extends Component {
                     </View>
                     <View>
                         <TouchableHighlight
-                            onPress={() => this.addItem()}
                             underlayColor='darkblue'>
                             <View>
                                 <Text style={styles.textSmall}>
@@ -204,6 +202,7 @@ class Map extends Component {
                         backgroundColor: 'white'
                     }}
                     geolocationEnabled={true}
+                    key={ this.state.key }
                 />
             </View>
         )
