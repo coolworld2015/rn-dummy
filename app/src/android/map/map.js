@@ -25,7 +25,7 @@ class Map extends Component {
 
     onMenu() {
         this.setState({
-            key: this.state.key + 1,
+            key: Math.round(Math.random()*10000),
             locationsList: `
             ['Point1', 49.093086, 8.533068, 1],
             ['Point2', 49.147995, 8.559998, 2],
@@ -42,7 +42,7 @@ class Map extends Component {
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <title>Google Maps Multiple Markers</title>
+    <title>Google Maps Multiple Markers - ${this.state.locationsList}</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 </head>
 <div>
@@ -55,6 +55,7 @@ class Map extends Component {
 
 
 <div id="map" style="width: 100%; height: 600px;">
+    ${this.state.key}
 </div>
 
 <script type="text/javascript">
@@ -187,7 +188,6 @@ class Map extends Component {
                     </View>
                     <View>
                         <TouchableHighlight
-                            onPress={() => this.addItem()}
                             underlayColor='darkblue'>
                             <View>
                                 <Text style={styles.textSmall}>
