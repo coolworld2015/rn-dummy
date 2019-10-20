@@ -32,6 +32,7 @@ target 'rnBase' do
   pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+  pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
 
   target 'rnBaseTests' do
     inherit! :search_paths
