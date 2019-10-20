@@ -40,8 +40,7 @@ class Map extends Component {
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <title>Google Maps Multiple Markers</title>
-    <script src="http://maps.google.com/maps/api/js?sensor=false"
-            type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 </head>
 <body style="background-color: black; color: white">
 <div>
