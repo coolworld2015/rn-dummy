@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import {WebView} from 'react-native-webview';
+import Geolocation from 'react-native-geolocation-service';
 
 class Map extends Component {
     constructor(props) {
@@ -19,10 +20,27 @@ class Map extends Component {
 
         this.state = {
             key: 0,
-            locationsList: ''
+            locationsList: '',
+            position: ''
         };
+    }
 
-        //window.navigator.geolocation.requestAuthorization();
+    componentDidMount() {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                this.setState( {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    position: position
+                });
+                console.log(position.coords);
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000}
+        );
     }
 
     onMenu() {
@@ -125,29 +143,17 @@ class Map extends Component {
     }
 
     function getPos() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, onMapError, {
-                    maximumAge: 300000,
-                    timeout: 5000,
-                    enableHighAccuracy: true
-                });
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
+        showPosition()
+     }
 
-    function onMapError(error) {
-        alert('code: ' + error.code + '\\n' +
-            'message: ' + error.message + '\\n');
-    }
 
-    function showPosition(position) {
+    function showPosition() {
         if (marker) {
             marker.setMap(null);
         }
-
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
+        
+        var lat = ${this.state.latitude};
+        var lng = ${this.state.longitude};
 
         map.setCenter(new google.maps.LatLng(lat, lng));
         marker = new google.maps.Marker({
@@ -203,7 +209,7 @@ class Map extends Component {
                         backgroundColor: 'white'
                     }}
                     geolocationEnabled={true}
-                    key={ this.state.key }
+                    key={this.state.key}
                 />
             </View>
         )
