@@ -143,6 +143,9 @@
         <div style="color: white;margin-top: -48px;margin-left: 12px;font-size: 30px;width: 200px;">
             VU-Demo
         </div>
+        <div style="color: white;margin-top: 20px;margin-left: 15px;font-size: 20px;width: 200px;">
+            by Eduard Tkachuk
+        </div>
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
 <!--            <li v-on:click="changeRoute('home')" v-bind:class="{ active: home }">
@@ -177,7 +180,7 @@
 
 <script>
     const appConfig = new Vue();
-    appConfig.route = 'home';
+    appConfig.route = 'map';
 
     const GoogleMap = {
         template: `
