@@ -208,35 +208,13 @@ class Map extends Component {
                     </View>
                 </View>
 
-                {/*<View style={styles.iconForm}>
-                    <View>
-                        <TextInput
-                            onChangeText={this.onChangeText.bind(this)}
-                            style={styles.searchLarge}
-                            value={this.state.searchQuery}
-                            placeholder="Search here">
-                        </TextInput>
-                    </View>
-                    <View style={styles.searchSmall}>
-                        <TouchableWithoutFeedback
-                            onPress={() => this.clearSearchQuery()}>
-                            <View>
-                                {image}
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                </View>*/}
-            <WebView
-                source={{html: html}}
-                style={{
-                    backgroundColor: 'white'
-                }}
-                geolocationEnabled={true}
-                //onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest.bind(this)}
-                //renderLoading={this.onShouldStartLoadWithRequest.bind(this)}
-                //source={{html:'<div>Cool<div>'}}
-                //source={{html:html}}
-            />
+                <WebView
+                    source={{html: html}}
+                    style={{
+                        backgroundColor: 'white'
+                    }}
+                    geolocationEnabled={true}
+                />
             </View>
         )
     }
