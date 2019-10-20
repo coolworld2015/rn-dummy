@@ -18,14 +18,21 @@ class Map extends Component {
         super(props);
 
         this.state = {
-            html: 'https://www.google.com.ua/maps/place/%D0%9F%D0%B5%D1%80%D0%BB%D0%B8%D0%BD%D0%B0+%D0%A0%D0%B5%D0%B7%D0%BE%D1%80%D1%82/@49.5443458,31.8516129,14z/data=!4m5!3m4!1s0x0:0xef0027af01f2c984!8m2!3d49.5443458!4d31.8691224?hl=ru'
+            key: 0,
+            locationsList: ''
         };
-
-        //window.navigator.geolocation.requestAuthorization();
     }
 
     onMenu() {
-        //appConfig.drawer.openDrawer();
+        this.setState({
+            key: this.state.key + 1,
+            locationsList: `
+            ['Point1', 49.093086, 8.533068, 1],
+            ['Point2', 49.147995, 8.559998, 2],
+            ['Point3', 49.116544, 8.551161, 3],
+            ['Point4', 49.166744, 8.551161, 4],
+            ['Point5', 49.176844, 8.551161, 5]`
+        })
     }
 
     render() {
@@ -52,11 +59,7 @@ class Map extends Component {
 </div>
 
 <script type="text/javascript">
-    var locations = [
-                    ['<div style1="margin: 0px; background: #00FFFF; "><img src="resort2_1.jpg" style="margin: 15px; width: 200px"><br><b>Перлина Резорт</b></div>', 49.093086, 8.533068, 1],
-                    ['А это - ЛЕС', 49.147995, 8.559998, 2],
-                    ['А это - <b>ПЛАВНИ</b>', 49.116544, 8.551161, 3]
-                ];
+    var locations = [${this.state.locationsList}];
     
     var symbolOne = {
                     path: 'M -2,0 0,-2 2,0 0,2 z',
