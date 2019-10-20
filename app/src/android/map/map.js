@@ -46,7 +46,6 @@ class Map extends Component {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 </head>
 <div>
-
         <button onClick="getPos()" style="border-radius: 10px; width: 70px; height: 45px; font-size: 12px; font-weight: bold; position: absolute; top: 10px; right: 5px; z-index: 100">Get 
         </button>
 
