@@ -46,7 +46,7 @@
         width: 100%;
         height: 100%;
         color: #ef835d;
-        color: red;
+        color: black;
         font-size: 200%;
         text-align: center;
         overflow-y: scroll;
@@ -229,9 +229,9 @@
                 },
                 image: '../img/blue-circle.png',
                 locations: [
-                    ['<div style="margin: 0px; color: black"><img src="resort2_1.jpg" style="margin: 15px; width: 200px"><br><b>Перлина Резорт</b></div>', 49.093086, 8.533068, 1],
-                    ['А это - ЛЕС', 49.147995, 8.559998, 2],
-                    ['А это - <b>ПЛАВНИ</b>', 49.116544, 8.551161, 3]
+                    ['<div style="margin: 0px; color: black"><img src="../img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
+                    ['Point2', 49.147995, 8.559998, 2],
+                    ['Point3', 49.116544, 8.551161, 3]
                 ],
                 flightPath: new google.maps.Polyline({
                     path: [
@@ -277,27 +277,14 @@
             },
             setPoints() {
                 var infowindow = new google.maps.InfoWindow();
+
                 for (var i = 0; i < this.locations.length; i++) {
-                    /*this.marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
-                        map: map
-                    });
-                    var infowindow = new google.maps.InfoWindow();
-
-                    google.maps.event.addListener(this.marker, 'click', (function (marker, i) {
-                        return function () {
-                            infowindow.setContent(this.locations[i][0]);
-                            infowindow.open(map, marker);
-                        }
-                    })(marker, i));*/
-
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
                         map: map
                     });
-                    var locations = [].concat(this.locations)
+                    var locations = [].concat(this.locations);
                     google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                        console.log(locations[i][1])
                         return function () {
                             infowindow.setContent(locations[i][0]);
                             infowindow.open(map, marker);
