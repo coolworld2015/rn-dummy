@@ -113,16 +113,6 @@ class Map extends Component {
     for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-            //icon: {
-                //path: google.maps.SymbolPath.CIRCLE,
-                //path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                //path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                //scale: 3
-            //},
-            //draggable: true,
-            //animation: google.maps.Animation.BOUNCE,
-            //icon: image,
-            //icon: symbolOne,
             map: map
         });
 
@@ -152,19 +142,19 @@ class Map extends Component {
     }
     
     function showPosition(position) {
-        if (marker1) {
-            marker1.setMap(null);
+        if (marker) {
+            marker.setMap(null);
         }
 
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
 
         map.setCenter(new google.maps.LatLng(lat, lng));
-        marker1 = new google.maps.Marker({
+        marker = new google.maps.Marker({
             position: new google.maps.LatLng(lat, lng),
             draggable: true,
-            animation: google.maps.Animation.BOUNCE,
-            icon: symbolOne,
+            //animation: google.maps.Animation.BOUNCE,
+            icon: image,
             map: map
         });
     }
