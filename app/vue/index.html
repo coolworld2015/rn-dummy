@@ -144,34 +144,27 @@
 <div id="app">
     <div id="mySidenav" class="sidenav">
         <div style="color: white;margin-top: -48px;margin-left: 12px;font-size: 30px;width: 200px;">
-            Google Maps API Demo
-        </div>
-        <div style="color: white;margin-top: 20px;margin-left: 15px;font-size: 20px;width: 200px;">
-            by Eduard Tkachuk
+            VU-Demo
         </div>
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
-<!--            <li v-on:click="changeRoute('home')" v-bind:class="{ active: home }">
+            <li v-on:click="changeRoute('home')" v-bind:class="{ active: home }">
                 <i class="fa fa-fw fa-home"></i><span style="margin: 15px;">Home</span></li>
+
+            <li v-on:click="changeRoute('goods-table')" v-bind:class="{ active: gtable }">
+                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Table</span></li>
+
             <li v-on:click="changeRoute('item-add')" v-bind:class="{ active: add }">
                 <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Add</span></li>
-            <li v-on:click="changeRoute('inline')" v-bind:class="{ active: inline }">
-                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Inline</span></li>-->
+
             <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
-            <li v-on:click="emitEvent('pos')" v-bind:class="{ active: pos }">
+
+            <li v-on:click="emitEvent('pos')" v-bind:class="{ active: pos }" v-if="map">
                 <i class="fa fa-fw fa-map-marker"></i><span style="margin: 15px;">Position</span></li>
 
         </ul>
     </div>
-
-    <!--<div class="top">
-            <top></top>
-        </div>-->
-
-    <!--<div class="bottom">
-        <bottom></bottom>
-    </div>-->
 
     <div id="main">
         <div class="middle">
@@ -183,7 +176,24 @@
 
 <script>
     const appConfig = new Vue();
-    appConfig.route = 'map';
+    appConfig.route = 'home';
+
+    const Goods = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                           <goods-items></goods-items>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
+    const GoodsTable = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                           <goods-items-table></goods-items-table>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
 
     const GoogleMap = {
         template: `
@@ -201,7 +211,7 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const PhoneShow = {template: '<phone-show></phone-show>'};
+    const PhoneShow = {template: '<goods-edit></goods-edit>'};
 
     const Dummy = {
         template: `
@@ -211,9 +221,16 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const DummyInline = {template: '<dummy-items-inline></dummy-items-inline>'};
-    const DummyEdit = {template: '<dummy-edit></dummy-edit>'};
-    const DummyAdd = {template: '<dummy-add></dummy-add>'};
+    const DummyInline = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                           <dummy-items-inline></dummy-items-inline>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
+    const DummyEdit = {template: '<goods-edit></goods-edit>'};
+    const DummyAdd = {template: '<goods-add></goods-add>'};
 
     Vue.component('googleMap', {
         template: '<div class="middle" id="map"></div>',
@@ -395,7 +412,80 @@
         methods: {},
     });
 
-    Vue.component('dummy-items-inline', {
+    Vue.component('goods-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.name }} - {{ item.price }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            }
+        },
+        created() {
+            this.fetchData();
+            appConfig.$on('searchQuery', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                appConfig.message = 'Loading...';
+                this.$http.get('http://ui-warehouse.herokuapp.com/api/goods/get')
+                    .then(result => {
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            sort(a, b) {
+                let nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase();
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+                return 0;
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('phone-show');
+            },
+        }
+    });
+
+    Vue.component('goods-items-table', {
         template: `<div>
         <div v-if="loading">
             <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
@@ -406,9 +496,8 @@
             <div style="margin-top: 100px;margin-bottom: 50px;">
                 <div style="color: black;border:solid 1px;height: 80px;" v-for="item in items" v-on:click1="showDetails(item)">
                     <input v-model="item.id" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;outline:none;" readonly/>
-                    <input v-model="item.employee_name" style="height: 40px;margin: 20px;font-size: 20px;width: 400px;"/>
-                    <input v-model="item.employee_age" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
-                    <input v-model="item.employee_salary" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
+                    <input v-model="item.name" style="height: 40px;margin: 20px;font-size: 20px;width: 400px;"/>
+                    <input v-model="item.price" style="height: 40px;margin: 20px;font-size: 20px;width: 100px;"/>
                     <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="updateItem(item)">Update</button>
                     <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="deleteItem(item)">Delete</button>
                     <button style="height: 40px;border-radius: 5px;width:100px;font-size:20px;" v-on:click="cancel">Cancel</button>
@@ -432,7 +521,7 @@
             this.fetchData();
             appConfig.$on('searchQuery', searchQuery => {
                 let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
                 this.items = items;
 
@@ -445,26 +534,40 @@
         },
         methods: {
             fetchData() {
-                this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
+                this.$http.get('http://ui-warehouse.herokuapp.com/api/goods/get')
                     .then(result => {
-                        this.items = JSON.parse(result.data);
-                        this.filteredItems = JSON.parse(result.data);
+                        this.items = result.data.sort(this.sort);
+                        this.filteredItems = result.data.sort(this.sort);
                         appConfig.items = this.filteredItems;
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
+                        console.log(error)
                         this.error = true;
                         this.loading = false;
                     });
             },
+            sort(a, b) {
+                let nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase();
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+                return 0;
+            },
             updateItem(item) {
                 this.loading = true;
-                this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + item.id,
+                this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/update/',
                     {
-                        name: item.employee_name,
-                        age: item.employee_age,
-                        salary: item.employee_salary,
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        store: false,
+                        description: 'cv'
                     })
                     .then(result => {
                         this.loading = true;
@@ -477,7 +580,10 @@
             },
             deleteItem(item) {
                 this.loading = true;
-                this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + item.id)
+                this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/delete',
+                    {
+                        id: item.id
+                    })
                     .then(result => {
                         this.loading = true;
                         this.fetchData();
@@ -490,76 +596,6 @@
             cancel() {
                 this.loading = true;
                 this.fetchData();
-            },
-        },
-    });
-
-    Vue.component('dummy-items1', {
-        template: `<div>
-        <div v-if="loading">
-            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
-            </div>
-        </div>
-        <div v-if="!loading">
-            <div style="margin-top: 100px;margin-bottom: 50px;">
-                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.id }} - {{ item.employee_name }} - {{ item.employee_age }} - {{ item.employee_salary }}</li></ul>
-            </div>
-        </div>
-        <div v-if="error">
-            Server error - try again
-        </div>
-        </div>`,
-        data: function () {
-            return {
-                items: [],
-                searchQuery: '',
-                filteredItems: [],
-                loading: true,
-                error: false,
-            };
-        },
-        created() {
-            this.fetchData();
-            appConfig.$on('searchQuery', searchQuery => {
-                let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-                this.filteredItems = items;
-                this.items = items;
-
-                appConfig.$emit('itemsCount', items.length);
-                if (searchQuery === '') {
-                    this.items = appConfig.items;
-                    this.filteredItems = appConfig.items;
-                }
-            });
-        },
-        methods: {
-            fetchData() {
-                appConfig.message = 'Loading...';
-                //this.$http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?&tags=coolworld&tagmode=any&format=json')
-
-
-                this.$http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?&tags=coolworld&tagmode=any&format=json')
-                    .then(data => {
-                        console.log(data.json());
-                    })
-                    /*.then(result => {
-                        console.log(result)
-                        this.items = JSON.parse(result.data);
-                        this.filteredItems = JSON.parse(result.data);
-                        appConfig.items = this.filteredItems;
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })*/
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('item-edit');
             },
         },
     });
@@ -627,7 +663,7 @@
         },
     });
 
-    Vue.component('dummy-edit', {
+    Vue.component('goods-edit', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
             <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
@@ -644,34 +680,34 @@
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="Name"
             v-on:keypress="clearWarning"
-            v-model="employee_name" ><br>
+            v-model="name" ><br>
 
             <span style="font-size: 24px; color: black;margin-left: -19px;">
-                Age:
+                Price:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="Age"
             v-on:keypress="clearWarning"
-            v-model="employee_age" ><br>
+            v-model="price" ><br>
 
             <span style="font-size: 24px; color: black;margin-left: -41px;">
-                Salary:
+                Descrip:
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="Salary"
             v-on:keypress="clearWarning"
-            v-model="employee_salary" ><br>
+            v-model="description" ><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
             </div>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;"
             v-on:click="updateItem">
                 Update
             </button>
 
-            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: red;color: white;outline:none;"
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;"
             v-on:click="deleteItem">
                 Delete
             </button><br>
@@ -695,9 +731,9 @@
             return {
                 id: '',
                 title: '',
-                employee_name: '',
-                employee_age: '',
-                employee_salary: '',
+                name: '',
+                price: '',
+                description: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -713,10 +749,10 @@
         methods: {
             init() {
                 this.id = appConfig.item.id;
-                this.title = appConfig.item.employee_name;
-                this.employee_name = appConfig.item.employee_name;
-                this.employee_age = appConfig.item.employee_age;
-                this.employee_salary = appConfig.item.employee_salary;
+                this.title = appConfig.item.name;
+                this.name = appConfig.item.name;
+                this.price = appConfig.item.price;
+                this.description = appConfig.item.description;
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
@@ -771,7 +807,7 @@
         },
     });
 
-    Vue.component('dummy-add', {
+    Vue.component('goods-add', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
         <div style="font-size: 40px;
@@ -785,7 +821,7 @@
             width: 450px;outline:none;margin-right: 0px;"
             placeholder="Name"
             v-on:keypress="clearWarning"
-            v-model="employee_name" ><br>
+            v-model="name" ><br>
 
             <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
@@ -793,7 +829,7 @@
             width: 450px;outline:none;margin-right: 0px;"
             placeholder="Age"
             v-on:keypress="clearWarning"
-            v-model="employee_age" ><br>
+            v-model="price" ><br>
 
             <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
@@ -801,7 +837,7 @@
             width: 450px;outline:none;margin-right: 0px;"
             placeholder="Salary"
             v-on:keypress="clearWarning"
-            v-model="employee_salary"><br>
+            v-model="description"><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -837,9 +873,9 @@
             return {
                 id: '',
                 title: '',
-                employee_name: '',
-                employee_age: '',
-                employee_salary: '',
+                name: '',
+                price: '',
+                description: '',
                 invalidValue: false,
                 error: false,
                 loading: false,
@@ -856,15 +892,15 @@
                 this.$router.push('/home');
             },
             addItem() {
-                if (this.employee_name === '') {
+                if (this.name === '') {
                     this.invalidValue = true;
                 }
 
-                if (this.employee_age === '') {
+                if (this.price === '') {
                     this.invalidValue = true;
                 }
 
-                if (this.employee_salary === '') {
+                if (this.description === '') {
                     this.invalidValue = true;
                 }
 
@@ -873,11 +909,14 @@
                 }
 
                 this.loading = true;
-                this.$http.post('http://dummy.restapiexample.com/api/v1/create',
+                this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/add/',
                     {
-                        name: this.employee_name,
-                        age: this.employee_age,
-                        salary: this.employee_salary,
+                        id: Math.round(Math.random()*100000000),
+                        name: this.name,
+                        price: this.price,
+                        quantity: 0,
+                        store: false,
+                        description: this.description
                     })
                     .then(result => {
                         this.$router.push('/home');
@@ -893,68 +932,6 @@
         },
     });
 
-    Vue.component('phones-items', {
-        template: `<div>
-        <div v-if="loading">
-            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
-            </div>
-        </div>
-        <div v-if="!loading">
-            <div style="margin-top: 100px;margin-bottom: 50px;">
-                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.name }} - {{ item.phone }}</li></ul>
-            </div>
-        </div>
-        <div v-if="error">
-            Server error - try again
-        </div>
-        </div>`,
-        data: function () {
-            return {
-                items: [],
-                searchQuery: '',
-                filteredItems: [],
-                loading: true,
-                error: false,
-            }
-        },
-        created() {
-            this.fetchData();
-            appConfig.$on('searchQuery', searchQuery => {
-                let arr = [].concat(appConfig.items);
-                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
-                this.filteredItems = items;
-                this.items = items;
-
-                appConfig.$emit('itemsCount', items.length);
-                if (searchQuery === '') {
-                    this.items = appConfig.items;
-                    this.filteredItems = appConfig.items;
-                }
-            });
-        },
-        methods: {
-            fetchData() {
-                appConfig.message = 'Loading...';
-                this.$http.get('https://ui-base.herokuapp.com/api/items/get')
-                    .then(result => {
-                        this.items = result.data;
-                        this.filteredItems = result.data;
-                        appConfig.items = this.filteredItems;
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
-            showDetails(item) {
-                appConfig.item = item;
-                this.$router.push('phone-show');
-            },
-        }
-    });
 
     Vue.component('phone-show', {
         props: ['item'],
@@ -1054,8 +1031,9 @@
     });
 
     const routes = [
-        {path: '/', component: GoogleMap},
-        {path: '/home', component: Phones},
+        {path: '/', component: Goods},
+        {path: '/home', component: Goods},
+        {path: '/goods-table', component: GoodsTable},
         {path: '/inline', component: DummyInline},
         {path: '/item-edit', component: DummyEdit},
         {path: '/item-add', component: DummyAdd},
@@ -1084,6 +1062,7 @@
                 this.pos = appConfig.route === 'pos';
                 this.inline = appConfig.route === 'inline';
                 this.add = appConfig.route === 'item-add';
+                this.gtable = appConfig.route === 'goods-table';
             },
             changeRoute(route) {
                 closeNav();
