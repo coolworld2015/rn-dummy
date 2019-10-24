@@ -245,7 +245,7 @@ class Users extends Component {
                         <TouchableWithoutFeedback>
                             <View>
                                 <Text style={styles.textLarge}>
-                                    Dummy.restapiexample
+                                    Rest API Demo
                                 </Text>
                             </View>
                         </TouchableWithoutFeedback>

@@ -91,8 +91,8 @@ const tabBarOptions = {
 
 const TabNavigator = createMaterialTopTabNavigator({
         Map: MapTab,
+        Demo: UsersTab,
         Chat: ChatTab,
-        Dummy: UsersTab,
         Quit: Logout,
     },
     {

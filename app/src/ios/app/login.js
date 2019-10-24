@@ -105,7 +105,7 @@ class Login extends Component {
 
                     <View style={styles.headerContainer}>
                         <Text style={styles.heading}>
-                            RN-CHAT
+                            RN-Demo
                         </Text>
                     </View>
 

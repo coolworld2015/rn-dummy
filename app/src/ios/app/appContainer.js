@@ -59,7 +59,7 @@ class Quit extends React.Component {
 
 const TabNavigator = createBottomTabNavigator({
         Map: MapTab,
-        Dummy: UsersTab,
+        Demo: UsersTab,
         Chat: ChatTab,
         Quit: Quit
     },
@@ -79,7 +79,7 @@ const TabNavigator = createBottomTabNavigator({
                         }}
                     />;
                 }
-                if (routeName === 'Dummy') {
+                if (routeName === 'Demo') {
                     iconName = <Image
                         source={require('../../../img/clock.png')}
                         style={{
