@@ -1392,13 +1392,22 @@
         </div>
         <div v-if="!loading">
             <div style="margin-top: 100px;margin-bottom: 50px;">
-                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                <div style="width: 15%;">
-                    <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
-                         style="width: 140px; height: 150px; border-radius: 20px">
-                </div>
-                {{ item.trackName }} - {{ item.primaryGenreName }} - {{ item.releaseDate.split('-')[0] }} - {{ item.kind }}
-                </li></ul>
+                <ul>
+                    <li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                        <div style="height: 150px;font-size: 25px;font-family: cursive;">
+                            <div style="width1: 15%;float: left;idth: 20%;">
+                                <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
+                                     style="width: 140px; height: 150px; border-radius: 20px">
+                            </div>
+                            <div style="float: left;margin: 50px;width: 80%;">
+                                <div style="float: left;width: 40%; text-overflow: ellipsis;">{{ item.trackName }} </div>
+                                <div style="float: left;width: 20%;">{{ item.primaryGenreName }} </div>
+                                <div style="float: left;width: 20%;">{{ item.releaseDate.split('-')[0] }} </div>
+                                <div style="float: left;width: 20%;">{{ item.kind }} </div>
+                            </div>
+                       </div>
+                    </li>
+                </ul>
             </div>
         </div>
         <div v-if="error">
@@ -1425,7 +1434,6 @@
         methods: {
             fetchData(searchQuery) {
                 this.status = 'loading';
-
 
                 this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + this.searchQuery)
                     .then((response) => response.json())
