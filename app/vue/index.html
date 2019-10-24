@@ -172,6 +172,8 @@
             <li v-on:click="emitEvent('pos')" v-bind:class="{ active: pos }" v-if="map">
                 <i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Position</span></li>
 
+            <li v-on:click="changeRoute('box')" v-bind:class="{ active: box }">
+                <i class="fa fa-fw fa-music"></i><span style="margin: 15px;">Box</span></li>
         </ul>
     </div>
 
@@ -189,11 +191,11 @@
 
     const Goods = {
         template: `
-                    <div>
-                        <div class="top"><top></top></div>
-                           <goods-items></goods-items>
-                        <div class="bottom"><bottom></bottom></div>
-                    </div>`
+        <div>
+            <div class="top"><top></top></div>
+               <goods-items></goods-items>
+            <div class="bottom"><bottom></bottom></div>
+        </div>`
     };
     const GoodsTable = {
         template: `
@@ -232,8 +234,17 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const EmployeesEdit= {template: '<employees-edit></employees-edit>'};
+    const EmployeesEdit = {template: '<employees-edit></employees-edit>'};
     const EmployeesAdd = {template: '<employees-add></employees-add>'};
+
+    const Box = {
+        template: `
+        <div>
+            <div class="top"><top></top></div>
+               <box-items></box-items>
+            <div class="bottom"><bottom></bottom></div>
+        </div>`
+    };
 
     Vue.component('top', {
         template: `<div>
@@ -261,9 +272,15 @@
                 let route;
 
                 switch (appConfig.route) {
-                    case "employees": route ='searchQueryEmployees'; break;
-                    case "goods": route ='searchQueryGoods'; break;
-                    case "phones": route ='searchQueryPhones'; break;
+                    case "employees":
+                        route = 'searchQueryEmployees';
+                        break;
+                    case "goods":
+                        route = 'searchQueryGoods';
+                        break;
+                    case "phones":
+                        route = 'searchQueryPhones';
+                        break;
                 }
                 appConfig.$emit(route, this.searchQuery);
             },
@@ -1078,7 +1095,7 @@
                 this.loading = true;
                 this.$http.post('http://ui-warehouse.herokuapp.com/api/goods/add/',
                     {
-                        id: Math.round(Math.random()*100000000),
+                        id: Math.round(Math.random() * 100000000),
                         name: this.name,
                         price: this.price,
                         quantity: 0,
@@ -1366,7 +1383,72 @@
         },
     });
 
-     const routes = [
+    Vue.component('box-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                <div style="width: 15%;">
+                    <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
+                         style="width: 140px; height: 150px; border-radius: 20px">
+                </div>
+                {{ item.trackName }} - {{ item.primaryGenreName }} - {{ item.releaseDate.split('-')[0] }} - {{ item.kind }}
+                </li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+
+        data() {
+            return {
+                items: [],
+                filteredItems: [],
+                recordsCount: 20,
+                positionY: 0,
+                status: 'loading',
+                clicked: false,
+                loading: true,
+                error: false,
+                searchQuery: 'marvel'
+            }
+        },
+        created() {
+            this.fetchData();
+        },
+        methods: {
+            fetchData(searchQuery) {
+                this.status = 'loading';
+
+
+                this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + this.searchQuery)
+                    .then((response) => response.json())
+                    .then(result => {
+                        this.items = result.results;
+                        this.filteredItems = result.results;
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+            },
+            showDetails(item) {
+                appConfig.box = item;
+                console.dir(item)
+                localStorage.setItem('item', JSON.stringify(item));
+                this.$router.push('box-show');
+            }
+        }
+
+
+    });
+
+    const routes = [
         {path: '/', component: Employees},
         {path: '/employees', component: Employees},
         {path: '/employees-add', component: EmployeesAdd},
@@ -1378,6 +1460,7 @@
         {path: '/phones', component: Phones},
         {path: '/phone-show', component: PhoneShow},
         {path: '/map', component: GoogleMap},
+        {path: '/box', component: Box},
     ];
 
     const router = new VueRouter({
@@ -1396,6 +1479,7 @@
         },
         methods: {
             init() {
+                this.box = appConfig.route === 'box';
                 this.employees = appConfig.route === 'employees';
                 this.goods = appConfig.route === 'goods';
                 this.map = appConfig.route === 'map';
