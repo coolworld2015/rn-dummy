@@ -170,7 +170,7 @@
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
 
             <li v-on:click="emitEvent('pos')" v-bind:class="{ active: pos }" v-if="map">
-                <i class="fa fa-fw fa-map-marker"></i><span style="margin: 15px;">Position</span></li>
+                <i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Position</span></li>
 
         </ul>
     </div>
@@ -1319,7 +1319,7 @@
                 this.showRoutes()
             },
             setPoints() {
-                var infowindow = new google.maps.InfoWindow();
+                let infowindow = new google.maps.InfoWindow();
 
                 for (var i = 0; i < this.locations.length; i++) {
                     marker = new google.maps.Marker({
@@ -1351,8 +1351,8 @@
                     marker.setMap(null);
                 }
 
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
 
                 map.setCenter(new google.maps.LatLng(lat, lng));
                 marker = new google.maps.Marker({
@@ -1365,6 +1365,7 @@
             }
         },
     });
+
      const routes = [
         {path: '/', component: Employees},
         {path: '/employees', component: Employees},
@@ -1387,7 +1388,8 @@
         el: '#app',
         router,
         data: {
-            map: false
+            map: false,
+            pos: ''
         },
         created() {
             this.init();
