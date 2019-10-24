@@ -282,6 +282,9 @@
                     case "phones":
                         route = 'searchQueryPhones';
                         break;
+                    case "box":
+                        route = 'searchQueryBox';
+                        break;
                 }
                 appConfig.$emit(route, this.searchQuery);
             },
@@ -1431,6 +1434,18 @@
         },
         created() {
             this.fetchData();
+            appConfig.$on('searchQueryBox', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.trackName.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
         },
         methods: {
             fetchData(searchQuery) {
@@ -1455,7 +1470,6 @@
 
 
     });
-
     Vue.component('box-show', {
         template: `<div>
             <div v-if="loading">
@@ -1518,7 +1532,7 @@
             }
         },
         created() {
-            let item = JSON.parse(localStorage.getItem('item'))
+            let item = JSON.parse(localStorage.getItem('item'));
             appConfig.box = Object.assign({}, item);
 
             if (!appConfig.box) {
