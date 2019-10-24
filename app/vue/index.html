@@ -7,7 +7,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
 
 <style>
     ::-webkit-scrollbar {
@@ -148,14 +148,23 @@
         </div>
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
-            <li v-on:click="changeRoute('home')" v-bind:class="{ active: home }">
-                <i class="fa fa-fw fa-home"></i><span style="margin: 15px;">Home</span></li>
+            <li v-on:click="changeRoute('employees')" v-bind:class="{ active: employees }">
+                <i class="fas fa-user-friends"></i><span style="margin: 15px;">Employees</span></li>
+
+            <li v-on:click="changeRoute('employees-add')" v-bind:class="{ active: add }">
+                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Add emp</span></li>
+
+            <li v-on:click="changeRoute('goods')" v-bind:class="{ active: goods }">
+                <i class="fas fa-warehouse"></i><span style="margin: 15px;">Goods</span></li>
 
             <li v-on:click="changeRoute('goods-table')" v-bind:class="{ active: gtable }">
-                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Table</span></li>
+                <i class="fa fa-fw fa-table"></i><span style="margin: 15px;">Goods table</span></li>
 
-            <li v-on:click="changeRoute('item-add')" v-bind:class="{ active: add }">
-                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Add</span></li>
+            <li v-on:click="changeRoute('goods-add')" v-bind:class="{ active: add }">
+                <i class="fa fa-fw fa-plus"></i><span style="margin: 15px;">Goods add</span></li>
+
+            <li v-on:click="changeRoute('phones')" v-bind:class="{ active: phones }">
+                <i class="fas fa-phone"></i><span style="margin: 15px;">Phones</span></li>
 
             <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
@@ -176,7 +185,7 @@
 
 <script>
     const appConfig = new Vue();
-    appConfig.route = 'home';
+    appConfig.route = 'employees';
 
     const Goods = {
         template: `
@@ -194,6 +203,8 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
+    const GoodsEdit = {template: '<goods-edit></goods-edit>'};
+    const GoodsAdd = {template: '<goods-add></goods-add>'};
 
     const GoogleMap = {
         template: `
@@ -211,26 +222,18 @@
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const PhoneShow = {template: '<goods-edit></goods-edit>'};
+    const PhoneShow = {template: '<phone-show></phone-show>'};
 
-    const Dummy = {
+    const Employees = {
         template: `
                     <div>
                         <div class="top"><top></top></div>
-                            <dummy-items></dummy-items>
+                            <employees-items></employees-items>
                         <div class="bottom"><bottom></bottom></div>
                     </div>`
     };
-    const DummyInline = {
-        template: `
-                    <div>
-                        <div class="top"><top></top></div>
-                           <dummy-items-inline></dummy-items-inline>
-                        <div class="bottom"><bottom></bottom></div>
-                    </div>`
-    };
-    const DummyEdit = {template: '<goods-edit></goods-edit>'};
-    const DummyAdd = {template: '<goods-add></goods-add>'};
+    const EmployeesEdit= {template: '<employees-edit></employees-edit>'};
+    const EmployeesAdd = {template: '<employees-add></employees-add>'};
 
     Vue.component('top', {
         template: `<div>
@@ -255,15 +258,21 @@
         },
         methods: {
             changeView() {
-                appConfig.$emit('searchQuery', this.searchQuery);
+                let route;
+
+                switch (appConfig.route) {
+                    case "employees": route ='searchQueryEmployees'; break;
+                    case "goods": route ='searchQueryGoods'; break;
+                    case "phones": route ='searchQueryPhones'; break;
+                }
+                appConfig.$emit(route, this.searchQuery);
             },
             searchClear() {
                 this.searchQuery = '';
-                appConfig.$emit('searchQuery', this.searchQuery);
+                this.changeView();
             },
         },
     });
-
     Vue.component('top-map', {
         template: `<div>
         <div style="float: left; margin: 20px; margin-top: 4px;">
@@ -288,7 +297,6 @@
             },
         },
     });
-
     Vue.component('bottom', {
         template: `<div>Records: {{count}}</div>`,
         data() {
@@ -304,115 +312,331 @@
         methods: {},
     });
 
-
-    Vue.component('googleMap', {
-        template: '<div class="middle" id="map"></div>',
-        data() {
+    Vue.component('employees-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.id }} - {{ item.employee_name }} - {{ item.employee_age }} - {{ item.employee_salary }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
             return {
-                map: '',
-                symbolOne: {
-                    path: 'M -2,0 0,-2 2,0 0,2 z',
-                    strokeColor: 'gold',
-                    fillColor: 'gold',
-                    fillOpacity: 1,
-                    scale: 3,
-                },
-                image: '../img/blue-circle.png',
-                locations: [
-                    ['<div style="margin: 0px; color: black"><img src="../img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
-                    ['Point2', 49.147995, 8.559998, 2],
-                    ['Point3', 49.116544, 8.551161, 3]
-                ],
-                flightPath: new google.maps.Polyline({
-                    path: [
-                        {lat: 49.093086, lng: 8.533068},
-                        {lat: 49.106580, lng: 8.544306},
-                        {lat: 49.116544, lng: 8.551161},
-                        {lat: 49.128808, lng: 8.550718},
-                        {lat: 49.133488, lng: 8.551667},
-                        {lat: 49.147995, lng: 8.559998},
-                    ],
-                    geodesic: true,
-                    strokeColor: '#01579B',
-                    strokeOpacity: 1.0,
-                    strokeWeight: 6
-                })
-            }
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            };
         },
         created() {
-            setTimeout(this.init, 500);
-            appConfig.$on('pos', searchQuery => {
-                this.getPos();
+            this.fetchData();
+            appConfig.$on('searchQueryEmployees', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
             });
         },
         methods: {
-            init() {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 13,
-                    center: new google.maps.LatLng(49.124966, 8.552490),
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                    //mapTypeId: google.maps.MapTypeId.SATELLITE
-                });
-
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.124966, 8.552490),
-                    draggable: true,
-                    animation: google.maps.Animation.BOUNCE,
-                    icon: this.symbolOne,
-                    map: map
-                });
-                appConfig.map = true;
-                this.setPoints();
-                this.showRoutes()
-            },
-            setPoints() {
-                var infowindow = new google.maps.InfoWindow();
-
-                for (var i = 0; i < this.locations.length; i++) {
-                    marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
-                        map: map
+            fetchData() {
+                appConfig.message = 'Loading...';
+                this.$http.get('http://dummy.restapiexample.com/api/v1/employees')
+                    .then(result => {
+                        this.items = JSON.parse(result.data);
+                        this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
                     });
-                    var locations = [].concat(this.locations);
-                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                        return function () {
-                            infowindow.setContent(locations[i][0]);
-                            infowindow.open(map, marker);
-                        }
-                    })(marker, i));
-                }
             },
-            showRoutes() {
-                this.flightPath.setMap(map);
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('employees-edit');
             },
-            getPos() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(this.showPosition);
-                } else {
-                    alert("Geolocation is not supported by this browser.");
-                }
-            },
-
-            showPosition(position) {
-                if (marker) {
-                    marker.setMap(null);
-                }
-
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-
-                map.setCenter(new google.maps.LatLng(lat, lng));
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat, lng),
-                    draggable: true,
-                    //animation: google.maps.Animation.BOUNCE,
-                    icon: this.image,
-                    map: map
-                });
-            }
         },
     });
+    Vue.component('employees-edit', {
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
+                {{ title }}
+            </div>
 
+            <span style="font-size: 24px; color: black;">ID:</span>
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            v-model="id"><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -33px;">
+                Name:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-model="employee_name" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -19px;">
+                Age:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Age"
+            v-on:keypress="clearWarning"
+            v-model="employee_age" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: -41px;">
+                Salary:
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="employee_salary" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;"
+            v-on:click="updateItem">
+                Update
+            </button>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;"
+            v-on:click="deleteItem">
+                Delete
+            </button><br>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">
+                Back
+            </button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="margin-top: 25px;">
+                Server error - try again
+            </div>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                employee_name: '',
+                employee_age: '',
+                employee_salary: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/employees');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                this.id = appConfig.item.id;
+                this.title = appConfig.item.employee_name;
+                this.employee_name = appConfig.item.employee_name;
+                this.employee_age = appConfig.item.employee_age;
+                this.employee_salary = appConfig.item.employee_salary;
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/employees');
+            },
+            updateItem() {
+                if (this.employee_name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.employee_age === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.employee_salary === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.put('http://dummy.restapiexample.com/api/v1/update/' + this.id,
+                    {
+                        name: this.employee_name,
+                        age: this.employee_age,
+                        salary: this.employee_salary,
+                    })
+                    .then(result => {
+                        this.$router.push('/employees');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            deleteItem() {
+                this.loading = true;
+                this.$http.delete('http://dummy.restapiexample.com/api/v1/delete/' + this.id)
+                    .then(result => {
+                        this.$router.push('/employees');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
+    Vue.component('employees-add', {
+        props: ['item'],
+        template: `<div style="text-align: center;margin-top: 120px;">
+        <div style="font-size: 40px;
+                        color: black;
+                        font-weight: bolder;
+                        margin: 20px;">New record</div>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -33px;">Name:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-model="employee_name" ><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -19px;">Age:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Age"
+            v-on:keypress="clearWarning"
+            v-model="employee_age" ><br>
+
+            <!--<span style="font-size: 24px; color: black;margin-left: -41px;">Salary:</span>-->
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;
+            border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;
+            width: 450px;outline:none;margin-right: 0px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="employee_salary"><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-top: 0px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            color: white;outline:none;"
+            v-on:click="addItem">Submit</button>
+
+            <button style="font-size: 24px;
+                            height: 50px;
+                            width: 150px;
+                            border-radius: 5px;
+                            background: #01579B;
+                            color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">Back</button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="margin-top: 25px;">
+                Server error - try again
+            </div>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                employee_name: '',
+                employee_age: '',
+                employee_salary: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            init() {
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/employees');
+            },
+            addItem() {
+                if (this.employee_name === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.employee_age === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.employee_salary === '') {
+                    this.invalidValue = true;
+                }
+
+                if (this.invalidValue) {
+                    return;
+                }
+
+                this.loading = true;
+                this.$http.post('http://dummy.restapiexample.com/api/v1/create',
+                    {
+                        name: this.employee_name,
+                        age: this.employee_age,
+                        salary: this.employee_salary,
+                    })
+                    .then(result => {
+                        this.$router.push('/employees');
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
 
     Vue.component('goods-items', {
         template: `<div>
@@ -441,7 +665,7 @@
         },
         created() {
             this.fetchData();
-            appConfig.$on('searchQuery', searchQuery => {
+            appConfig.$on('searchQueryGoods', searchQuery => {
                 let arr = [].concat(appConfig.items);
                 let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
                 this.filteredItems = items;
@@ -482,11 +706,10 @@
             },
             showDetails(item) {
                 appConfig.item = item;
-                this.$router.push('phone-show');
+                this.$router.push('goods-edit');
             },
         }
     });
-
     Vue.component('goods-items-table', {
         template: `<div>
         <div v-if="loading">
@@ -601,7 +824,6 @@
             },
         },
     });
-
     Vue.component('goods-edit', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
@@ -680,7 +902,7 @@
         },
         created() {
             if (!appConfig.item) {
-                this.$router.push('/home');
+                this.$router.push('/goods');
             } else {
                 this.init();
             }
@@ -696,7 +918,7 @@
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
-                this.$router.push('/home');
+                this.$router.push('/goods');
             },
             updateItem() {
                 if (this.name === '') {
@@ -726,7 +948,7 @@
                         description: 'cv'
                     })
                     .then(result => {
-                        this.$router.push('/home');
+                        this.$router.push('/goods');
                     })
                     .catch(error => {
                         this.error = true;
@@ -740,7 +962,7 @@
                         id: this.id
                     })
                     .then(result => {
-                        this.$router.push('/home');
+                        this.$router.push('/goods');
                     })
                     .catch(error => {
                         this.error = true;
@@ -752,7 +974,6 @@
             },
         },
     });
-
     Vue.component('goods-add', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
@@ -835,7 +1056,7 @@
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
-                this.$router.push('/home');
+                this.$router.push('/goods');
             },
             addItem() {
                 if (this.name === '') {
@@ -865,7 +1086,7 @@
                         description: this.description
                     })
                     .then(result => {
-                        this.$router.push('/home');
+                        this.$router.push('/goods');
                     })
                     .catch(error => {
                         this.error = true;
@@ -878,7 +1099,68 @@
         },
     });
 
+    Vue.component('phones-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.name }} - {{ item.phone }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            }
+        },
+        created() {
+            this.fetchData();
+            appConfig.$on('searchQueryPhones', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
 
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            fetchData() {
+                appConfig.message = 'Loading...';
+                this.$http.get('https://ui-base.herokuapp.com/api/items/get')
+                    .then(result => {
+                        this.items = result.data;
+                        this.filteredItems = result.data;
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('phone-show');
+            },
+        }
+    });
     Vue.component('phone-show', {
         props: ['item'],
         template: `<div style="text-align: center;margin-top: 120px;">
@@ -952,7 +1234,7 @@
         },
         created() {
             if (!appConfig.item) {
-                this.$router.push('/home');
+                this.$router.push('/phones');
             } else {
                 this.init();
             }
@@ -968,7 +1250,7 @@
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
-                this.$router.push('/home');
+                this.$router.push('/phones');
             },
             clearWarning() {
                 this.invalidValue = false;
@@ -976,13 +1258,122 @@
         },
     });
 
-    const routes = [
-        {path: '/', component: Goods},
-        {path: '/home', component: Goods},
+    Vue.component('googleMap', {
+        template: '<div class="middle" id="map"></div>',
+        data() {
+            return {
+                map: '',
+                symbolOne: {
+                    path: 'M -2,0 0,-2 2,0 0,2 z',
+                    strokeColor: 'gold',
+                    fillColor: 'gold',
+                    fillOpacity: 1,
+                    scale: 3,
+                },
+                image: '../img/blue-circle.png',
+                locations: [
+                    ['<div style="margin: 0px; color: black"><img src="../img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
+                    ['Point2', 49.147995, 8.559998, 2],
+                    ['Point3', 49.116544, 8.551161, 3]
+                ],
+                flightPath: new google.maps.Polyline({
+                    path: [
+                        {lat: 49.093086, lng: 8.533068},
+                        {lat: 49.106580, lng: 8.544306},
+                        {lat: 49.116544, lng: 8.551161},
+                        {lat: 49.128808, lng: 8.550718},
+                        {lat: 49.133488, lng: 8.551667},
+                        {lat: 49.147995, lng: 8.559998},
+                    ],
+                    geodesic: true,
+                    strokeColor: '#01579B',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 6
+                })
+            }
+        },
+        created() {
+            setTimeout(this.init, 500);
+            appConfig.$on('pos', searchQuery => {
+                this.getPos();
+            });
+        },
+        methods: {
+            init() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 13,
+                    center: new google.maps.LatLng(49.124966, 8.552490),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    //mapTypeId: google.maps.MapTypeId.SATELLITE
+                });
+
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(49.124966, 8.552490),
+                    draggable: true,
+                    animation: google.maps.Animation.BOUNCE,
+                    icon: this.symbolOne,
+                    map: map
+                });
+                appConfig.map = true;
+                this.setPoints();
+                this.showRoutes()
+            },
+            setPoints() {
+                var infowindow = new google.maps.InfoWindow();
+
+                for (var i = 0; i < this.locations.length; i++) {
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
+                        map: map
+                    });
+                    var locations = [].concat(this.locations);
+                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                        return function () {
+                            infowindow.setContent(locations[i][0]);
+                            infowindow.open(map, marker);
+                        }
+                    })(marker, i));
+                }
+            },
+            showRoutes() {
+                this.flightPath.setMap(map);
+            },
+            getPos() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(this.showPosition);
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            },
+
+            showPosition(position) {
+                if (marker) {
+                    marker.setMap(null);
+                }
+
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                map.setCenter(new google.maps.LatLng(lat, lng));
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(lat, lng),
+                    draggable: true,
+                    //animation: google.maps.Animation.BOUNCE,
+                    icon: this.image,
+                    map: map
+                });
+            }
+        },
+    });
+     const routes = [
+        {path: '/', component: Employees},
+        {path: '/employees', component: Employees},
+        {path: '/employees-add', component: EmployeesAdd},
+        {path: '/employees-edit', component: EmployeesEdit},
+        {path: '/goods', component: Goods},
         {path: '/goods-table', component: GoodsTable},
-        {path: '/inline', component: DummyInline},
-        {path: '/item-edit', component: DummyEdit},
-        {path: '/item-add', component: DummyAdd},
+        {path: '/goods-edit', component: GoodsEdit},
+        {path: '/goods-add', component: GoodsAdd},
         {path: '/phones', component: Phones},
         {path: '/phone-show', component: PhoneShow},
         {path: '/map', component: GoogleMap},
@@ -1003,9 +1394,10 @@
         },
         methods: {
             init() {
-                this.home = appConfig.route === 'home';
+                this.employees = appConfig.route === 'employees';
+                this.goods = appConfig.route === 'goods';
                 this.map = appConfig.route === 'map';
-                this.pos = appConfig.route === 'pos';
+                this.phones = appConfig.route === 'phones';
                 this.inline = appConfig.route === 'inline';
                 this.add = appConfig.route === 'item-add';
                 this.gtable = appConfig.route === 'goods-table';
