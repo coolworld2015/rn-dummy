@@ -187,7 +187,6 @@
 
 <script>
     const appConfig = new Vue();
-    appConfig.route = 'employees';
 
     const Goods = {
         template: `
@@ -271,7 +270,6 @@
         methods: {
             changeView() {
                 let route;
-
                 switch (appConfig.route) {
                     case "employees":
                         route = 'searchQueryEmployees';
@@ -1449,8 +1447,6 @@
         },
         methods: {
             fetchData(searchQuery) {
-                this.status = 'loading';
-
                 this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + this.searchQuery)
                     .then((response) => response.json())
                     .then(result => {
@@ -1596,6 +1592,7 @@
         },
         created() {
             this.init();
+            appConfig.route = this.$route.path.split('/')[1];
         },
         methods: {
             init() {
