@@ -250,7 +250,14 @@
     };
     const BoxShow = {template: '<box-show></box-show>'};
 
-    const Chat = {template: '<chat-items></chat-items>'};
+    const Chat = {
+        template: `
+        <div>
+            <div class="top"><top></top></div>
+                <chat-items></chat-items>
+            <div class="bottom"><bottom></bottom></div>
+        </div>`
+    };
 
     Vue.component('top', {
         template: `<div>
@@ -1627,7 +1634,7 @@
         </div>`,
         data() {
             return {
-                items: [{name:'test'}],
+                items: [{name:'started', message:'Chat'}],
                 filteredItems: [],
                 loading: false,
                 error: false,
