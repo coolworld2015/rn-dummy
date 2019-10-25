@@ -280,6 +280,7 @@ class Chat extends Component {
 								color: 'black',
 								backgroundColor: 'white'
 							}}
+                            placeholderTextColor='gray'
 							placeholder='Message'>
 						</TextInput>
 

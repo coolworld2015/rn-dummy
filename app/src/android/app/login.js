@@ -141,6 +141,7 @@ class Login extends Component {
                             backgroundColor: 'white'
                         }}
                         value={this.state.username}
+                        placeholderTextColor='gray'
                         placeholder='Login'>
                     </TextInput>
 
@@ -164,6 +165,7 @@ class Login extends Component {
                         }}
                         value={this.state.password}
                         placeholder='Password'
+                        placeholderTextColor='gray'
                         secureTextEntry={true}>
                     </TextInput>
 
