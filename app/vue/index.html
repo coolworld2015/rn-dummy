@@ -148,6 +148,10 @@
         </div>
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
+
+            <li v-on:click="changeRoute('chat')" v-bind:class="{ active: chat }">
+                <i class="fas fa-comments"></i><span style="margin: 15px;">Chat</span></li>
+
             <li v-on:click="changeRoute('employees')" v-bind:class="{ active: employees }">
                 <i class="fas fa-user-friends"></i><span style="margin: 15px;">Employees</span></li>
 
@@ -245,6 +249,8 @@
         </div>`
     };
     const BoxShow = {template: '<box-show></box-show>'};
+
+    const Chat = {template: '<chat-items></chat-items>'};
 
     Vue.component('top', {
         template: `<div>
@@ -1591,6 +1597,82 @@
         }
     });
 
+    Vue.component('chat-items', {
+        template: `<div v-on:click="goSend()">
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+
+                    <div style="color: black;" v-for="item in items">
+                        <div style="border: 1px solid; padding: 10px; height: 150px;font-size: 25px;font-family: cursive;">
+
+                            <div style="float: left;margin-top: 50px;width: 100%;">
+                                <div style="float: left;width: 40%; text-overflow: ellipsis;">{{ item.message }} </div>
+                                <div style="float: left;width: 20%; text-overflow: ellipsis;">{{ item.date }} </div>
+                                <div style="float: left;width: 40%; text-overflow: ellipsis;">{{ item.name }} </div>
+
+                            </div>
+                       </div>
+                    </div>
+
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data() {
+            return {
+                items: [{name:'test'}],
+                filteredItems: [],
+                loading: false,
+                error: false,
+            };
+        },
+        created() {
+            Notification.requestPermission().then(function(result) {
+                /*let notification = new Notification('VU-Demo', {
+                    icon: '../img/logo.jpg',
+                    body: 'Hey there! Chat is started!',
+                });*/
+            });
+
+            if (window.ws === undefined) {
+                window.ws = new WebSocket('wss://jwt-chat.herokuapp.com');
+            }
+
+            ws.onmessage = (e) => {
+                let messageObject = e.data;
+                if (messageObject.split('###')[0] !== 'still alive') {
+                    this.items.unshift({
+                        id: +new Date(),
+                        name: messageObject.split('###')[1],
+                        date: messageObject.split('###')[2],
+                        message: messageObject.split('###')[0]
+                    });
+
+                    let notification = new Notification('VU-Demo', {
+                        icon: '../img/logo.jpg',
+                        body: messageObject.split('###')[0],
+                    });
+
+                    appConfig.$emit('itemsCount', this.items.length);
+                }
+            };
+        },
+        methods: {
+            goSend() {
+                let messageObject;
+                messageObject = 'Test from Demo' + '###' + 'Guest';
+                ws.send(messageObject);
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: Employees},
         {path: '/employees', component: Employees},
@@ -1605,6 +1687,7 @@
         {path: '/map', component: GoogleMap},
         {path: '/box', component: Box},
         {path: '/box-show', component: BoxShow},
+        {path: '/chat', component: Chat},
     ];
 
     const router = new VueRouter({
@@ -1632,6 +1715,7 @@
                 this.inline = appConfig.route === 'inline';
                 this.add = appConfig.route === 'item-add';
                 this.gtable = appConfig.route === 'goods-table';
+                this.chat = appConfig.route === 'chat';
             },
             changeRoute(route) {
                 closeNav();
