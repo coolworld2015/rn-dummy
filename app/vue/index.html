@@ -1398,23 +1398,23 @@
             </div>
         </div>
         <div v-if="!loading">
-            <div style="margin-top: 100px;margin-bottom: 50px;">
-                <ul>
-                    <li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">
-                        <div style="height: 150px;font-size: 25px;font-family: cursive;">
-                            <div style="width1: 15%;float: left;idth: 20%;">
+            <div style="margin-top: 95px;margin-bottom: 50px;">
+
+                    <div style="color: black;" v-for="item in items" v-on:click="showDetails(item)">
+                        <div style="border: 1px solid; padding: 10px; height: 150px;font-size: 25px;font-family: cursive;">
+                            <div style="width: 20%;float: left;">
                                 <img :src="item.artworkUrl100.replace('100x100bb.jpg', '500x500bb.jpg')"
                                      style="width: 140px; height: 150px; border-radius: 20px">
                             </div>
-                            <div style="float: left;margin: 50px;width: 80%;">
+                            <div style="float: left;margin-top: 50px;width: 80%;">
                                 <div style="float: left;width: 40%; text-overflow: ellipsis;">{{ item.trackName }} </div>
                                 <div style="float: left;width: 20%;">{{ item.primaryGenreName }} </div>
                                 <div style="float: left;width: 20%;">{{ item.releaseDate.split('-')[0] }} </div>
                                 <div style="float: left;width: 20%;">{{ item.kind }} </div>
                             </div>
                        </div>
-                    </li>
-                </ul>
+                    </div>
+
             </div>
         </div>
         <div v-if="error">
