@@ -291,7 +291,7 @@
                 this.changeView();
             },
             goSearch() {
-                if (this.$route.path.split('/')[1] === 'box') {
+                if (appConfig.route === 'box') {
                     appConfig.$emit('searchQueryITunes', this.searchQuery);
                 }
             }
@@ -1450,6 +1450,7 @@
                 }
             });
             appConfig.$on('searchQueryITunes', searchQuery => {
+                this.loading = true;
                 this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + searchQuery)
                     .then((response) => response.json())
                     .then(result => {
@@ -1479,6 +1480,10 @@
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
                     })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
             },
             showDetails(item) {
                 appConfig.box = item;
