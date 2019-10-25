@@ -256,9 +256,9 @@
                 <label>
                     <input type="text" style="font-size: 24px;height: 50px; width1: 400px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px;outline:none;"
                         placeholder="Search by name"
-                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView">
+                        v-model="searchQuery" v-on:click="searchClear" v-on:keyup="changeView" v-on:keyup.enter="goSearch">
                 </label>
-                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;"><i class="fa fa-fw fa-search"></i></div>
+                <div style="margin-top: -39px;font-size: 30px;margin-left: 230px;color: black;margin-right: -60px;" v-on:click="goSearch"><i class="fa fa-fw fa-search"></i></div>
             </form>
         </div>
         </div>`,
@@ -290,6 +290,11 @@
                 this.searchQuery = '';
                 this.changeView();
             },
+            goSearch() {
+                if (this.$route.path.split('/')[1] === 'box') {
+                    appConfig.$emit('searchQueryITunes', this.searchQuery);
+                }
+            }
         },
     });
     Vue.component('top-map', {
@@ -1444,6 +1449,24 @@
                     this.filteredItems = appConfig.items;
                 }
             });
+            appConfig.$on('searchQueryITunes', searchQuery => {
+                this.$http.jsonp('https://itunes.apple.com/search?media=all&term=' + searchQuery)
+                    .then((response) => response.json())
+                    .then(result => {
+                        this.items = result.results;
+                        this.filteredItems = result.results;
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    });
+
+                appConfig.$emit('itemsCount', this.items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+
         },
         methods: {
             fetchData(searchQuery) {
