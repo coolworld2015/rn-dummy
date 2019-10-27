@@ -32,7 +32,7 @@ class Map extends Component {
             this.setState({
                 showProgress: false,
             });
-        }, 300);
+        }, 1000);
     }
 
     refreshData(event) {
