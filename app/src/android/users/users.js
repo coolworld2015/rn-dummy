@@ -18,6 +18,8 @@ import {
 
 import ListView from 'deprecated-react-native-listview';
 
+import MenuDrawer from 'react-native-side-drawer';
+
 class Users extends Component {
     constructor(props) {
         super(props);
@@ -35,6 +37,7 @@ class Users extends Component {
             positionY: 0,
             searchQuery: '',
             refreshing: false,
+            open: false
         };
 
         this.getItems();
@@ -196,20 +199,60 @@ class Users extends Component {
     }
 
     onMenu() {
-        this.refs['DRAWER_REF'].openDrawer();
+        this.setState({open: true});
     }
 
     menuClose() {
-        this.refs['DRAWER_REF'].closeDrawer();
+        this.setState({open: false});
     }
 
-    refGetItems() {
+    menuAddItem() {
+        this.setState({open: false});
+        this.addItem();
+    }
+
+    getItemsMenu() {
         this.setState({
             showProgress: true,
             resultsCount: 0,
         });
         this.getItems();
-        this.refs['DRAWER_REF'].closeDrawer();
+        this.setState({open: false});
+    }
+
+    drawerContent() {
+        return (
+            <View style={{flex: 1, backgroundColor: 'black', marginTop: 0}}>
+                <Text style={styles.layoutText} onPress={() => this.menuClose()}>
+                    Rest API Demo
+                </Text>
+
+                <TouchableHighlight
+                    onPress={() => this.getItemsMenu()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Reload
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this.menuAddItem()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        New
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this.menuClose()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Close
+                    </Text>
+                </TouchableHighlight>
+
+            </View>
+        );
     }
 
     render() {
@@ -242,134 +285,106 @@ class Users extends Component {
             />;
         }
 
-        let navigationView = (
-            <View style={{flex: 1, backgroundColor: 'black'}}>
-                <Text style={styles.layoutText}  onPress={() => this.menuClose()}>
-                    Rest API Demo
-                </Text>
-
-                <TouchableHighlight
-                    onPress={() => this.refGetItems()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Reload
-                    </Text>
-                </TouchableHighlight>
-
-{/*                <TouchableHighlight
-                    onPress={() => this._handlePress2()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Page 2
-                    </Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                    onPress={() => this._handlePress3()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Page 3
-                    </Text>
-                </TouchableHighlight>*/}
-            </View>
-        );
-
         return (
-            <DrawerLayoutAndroid
-                ref={'DRAWER_REF'}
-                drawerWidth={200}
-                drawerPosition={DrawerLayoutAndroid.positions.Left}
-                renderNavigationView={() => navigationView}>
-
+            <View style={styles.container}>
                 <View style={styles.container}>
-                    <View style={styles.header}>
-                        <View>
-                            <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
-                                <View>
-                                    <Image
-                                        style={styles.menu}
-                                        source={require('../../../img/menu.png')}
-                                    />
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                        <View>
-                            <TouchableWithoutFeedback>
-                                <View>
-                                    <Text style={styles.textLarge}>
-                                        Rest API Demo
-                                    </Text>
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                        <View>
-                            <TouchableHighlight
-                                onPress={() => this.addItem()}
-                                underlayColor='darkblue'>
-                                <View>
-                                    <Text style={styles.textSmall}>
-                                        New
-                                    </Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-                    </View>
+                    <MenuDrawer
+                        open={this.state.open}
+                        drawerContent={this.drawerContent()}
+                        drawerPercentage={50}
+                        animationTime={50}
+                        overlay={true}
+                        opacity={0.3}>
 
-                    <View style={styles.iconForm}>
-                        <View>
-                            <TextInput
-                                underlineColorAndroid='rgba(0,0,0,0)'
-                                onChangeText={this.onChangeText.bind(this)}
-                                style={styles.searchLarge}
-                                value={this.state.searchQuery}
-                                placeholderTextColor='gray'
-                                placeholder='Search here'>
-                            </TextInput>
-                        </View>
-                        <View style={styles.searchSmall}>
-                            <TouchableWithoutFeedback
-                                onPress={() => this.clearSearchQuery()}>
-                                <View>
-                                    {image}
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                    </View>
-
-                    {errorCtrl}
-
-                    {loader}
-
-                    <ScrollView
-                        onScroll={this.refreshData.bind(this)}
-                        scrollEventThrottle={16}
-                        refreshControl={
-                            <RefreshControl
-                                enabled={true}
-                                refreshing={this.state.refreshing}
-                                onRefresh={this.refreshDataAndroid.bind(this)}
-                            />
-                        }>
-                        <ListView
-                            style={styles.scroll}
-                            enableEmptySections={true}
-                            dataSource={this.state.dataSource}
-                            renderRow={this.renderRow.bind(this)}
-                        />
-                    </ScrollView>
-
-                    <View>
-                        <TouchableWithoutFeedback
-                            onPress={() => this.clearSearchQuery()}>
+                        <View style={styles.header}>
                             <View>
-                                <Text style={styles.countFooter}>
-                                    Records: {this.state.resultsCount}
-                                </Text>
+                                <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                                    <View>
+                                        <Image
+                                            style={styles.menu}
+                                            source={require('../../../img/menu.png')}
+                                        />
+                                    </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                        </TouchableWithoutFeedback>
-                    </View>
+                            <View>
+                                <TouchableWithoutFeedback>
+                                    <View>
+                                        <Text style={styles.textLarge}>
+                                            Rest API Demo
+                                        </Text>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                            <View>
+                                <TouchableHighlight
+                                    onPress={() => this.addItem()}
+                                    underlayColor='darkblue'>
+                                    <View>
+                                        <Text style={styles.textSmall}>
+                                            New
+                                        </Text>
+                                    </View>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
+
+                        <View style={styles.iconForm}>
+                            <View>
+                                <TextInput
+                                    underlineColorAndroid='rgba(0,0,0,0)'
+                                    onChangeText={this.onChangeText.bind(this)}
+                                    style={styles.searchLarge}
+                                    value={this.state.searchQuery}
+                                    placeholderTextColor='gray'
+                                    placeholder='Search here'>
+                                </TextInput>
+                            </View>
+                            <View style={styles.searchSmall}>
+                                <TouchableWithoutFeedback
+                                    onPress={() => this.clearSearchQuery()}>
+                                    <View>
+                                        {image}
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                        </View>
+
+                        {errorCtrl}
+
+                        {loader}
+
+                        <ScrollView
+                            onScroll={this.refreshData.bind(this)}
+                            scrollEventThrottle={16}
+                            refreshControl={
+                                <RefreshControl
+                                    enabled={true}
+                                    refreshing={this.state.refreshing}
+                                    onRefresh={this.refreshDataAndroid.bind(this)}/>
+                            }>
+                            <ListView
+                                style={styles.scroll}
+                                enableEmptySections={true}
+                                dataSource={this.state.dataSource}
+                                renderRow={this.renderRow.bind(this)}
+                            />
+                        </ScrollView>
+                    </MenuDrawer>
                 </View>
-            </DrawerLayoutAndroid>
+
+                <View>
+                    <TouchableWithoutFeedback
+                        onPress={() => this.clearSearchQuery()}>
+                        <View>
+                            <Text style={styles.countFooter}>
+                                Records: {this.state.resultsCount}
+                            </Text>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </View>
+
+            </View>
         );
     }
 }
