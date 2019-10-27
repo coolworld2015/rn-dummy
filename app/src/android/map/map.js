@@ -71,7 +71,7 @@ class Map extends Component {
             this.setState({
                 showProgress: false,
             });
-        }, 300);
+        }, 1000);
     }
 
     onMenu() {
@@ -327,9 +327,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'darkblue',
-        borderWidth: 0,
-        borderColor: 'whitesmoke',
-        marginTop: 0,
+        //borderTopWidth: 1,
+        borderColor: 'white',
     },
     searchLarge: {
         height: 45,

@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'darkblue',
-        borderTopWidth: 1,
+        //borderTopWidth: 1,
         borderColor: 'white',
     },
     searchLarge: {
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     },
     layoutText: {
         color: 'white',
-        margin: 10,
+        marginTop: 20,
         fontWeight: 'bold',
         fontSize: 15,
         textAlign: 'center'
@@ -499,7 +499,8 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 20,
         textAlign: 'center',
-        padding: 20,
+        padding: 15,
+        marginTop: 20,
         fontWeight: 'bold',
         color: 'white',
         backgroundColor: 'darkblue'
