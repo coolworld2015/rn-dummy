@@ -58,8 +58,8 @@ class Quit extends React.Component {
 }
 
 const TabNavigator = createBottomTabNavigator({
-        Demo: UsersTab,
         Map: MapTab,
+        Demo: UsersTab,
         Chat: ChatTab,
         Quit: Quit
     },

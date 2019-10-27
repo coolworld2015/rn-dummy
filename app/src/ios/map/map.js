@@ -8,11 +8,12 @@ import {
     TouchableHighlight,
     TouchableWithoutFeedback,
     Dimensions,
-    Image,
+    Image, ActivityIndicator, ScrollView,
 } from 'react-native';
 
 import {WebView} from 'react-native-webview';
 import Geolocation from 'react-native-geolocation-service';
+import MenuDrawer from 'react-native-side-drawer';
 
 class Map extends Component {
     constructor(props) {
@@ -20,15 +21,17 @@ class Map extends Component {
 
         this.state = {
             key: 0,
+            showProgress: true,
             locationsList: '',
-            position: ''
+            position: '',
+            open: false
         };
     }
 
     componentDidMount() {
         Geolocation.getCurrentPosition(
             (position) => {
-                this.setState( {
+                this.setState({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     position: position
@@ -41,10 +44,38 @@ class Map extends Component {
             },
             {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000}
         );
+
+        setTimeout(() => {
+            this.setState({
+                showProgress: false,
+            });
+        }, 300);
+
     }
 
-    onMenu() {
+    refreshData(event) {
+        if (this.state.showProgress === true) {
+            return;
+        }
+
+        if (event.nativeEvent.contentOffset.y <= -50) {
+            this.setState({
+                showProgress: true,
+                resultsCount: 0,
+                recordsCount: 25,
+                positionY: 0,
+                searchQuery: '',
+            });
+
+            setTimeout(() => {
+                this.mapReload();
+            }, 300);
+        }
+    }
+
+    mapReload() {
         this.setState({
+            showProgress: true,
             key: this.state.key + 1,
             locationsList: `
             ['Point1', 49.093086, 8.533068, 1],
@@ -52,10 +83,65 @@ class Map extends Component {
             ['Point3', 49.116544, 8.551161, 3],
             ['Point4', 49.166744, 8.551161, 4],
             ['Point5', 49.176844, 8.551161, 5]`
-        })
+        });
+
+        setTimeout(() => {
+            this.setState({
+                showProgress: false,
+            });
+        }, 300);
+    }
+
+    onMenu() {
+        this.setState({open: true});
+    }
+
+    menuClose() {
+        this.setState({open: false});
+    }
+
+    getItemsMenu() {
+        this.mapReload();
+        this.setState({open: false});
+    }
+
+    drawerContent() {
+        return (
+            <View style={{flex: 1, backgroundColor: 'black', marginTop: 50}}>
+                <Text style={styles.layoutText} onPress={() => this.menuClose()}>
+                    Google Maps API Demo
+                </Text>
+
+                <TouchableHighlight
+                    onPress={() => this.getItemsMenu()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Reload
+                    </Text>
+                </TouchableHighlight>
+
+                {/*<TouchableHighlight
+                    onPress={() => this.menuAddItem()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        New
+                    </Text>
+                </TouchableHighlight>*/}
+
+                <TouchableHighlight
+                    onPress={() => this.menuClose()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Close
+                    </Text>
+                </TouchableHighlight>
+
+            </View>
+        );
     }
 
     render() {
+
         let html = `
 <!DOCTYPE html>
 <html>
@@ -170,48 +256,85 @@ class Map extends Component {
     }
 </script>`;
 
+        let loader;
+
+        if (this.state.showProgress) {
+            loader = <View style={styles.loader}>
+                <ActivityIndicator
+                    size="large"
+                    color="darkblue"
+                    animating={true}
+                />
+            </View>;
+        }
+
         return (
             <View style={styles.container}>
-                <View style={styles.header}>
-                    <View>
-                        <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
-                            <View>
-                                <Image
-                                    style={styles.menu}
-                                    source={require('../../../img/menu.png')}
-                                />
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                    <View>
-                        <TouchableWithoutFeedback>
-                            <View>
-                                <Text style={styles.textLarge}>
-                                    Google Maps API Demo
-                                </Text>
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                    <View>
-                        <TouchableHighlight
-                            underlayColor='darkblue'>
-                            <View>
-                                <Text style={styles.textSmall}>
-                                </Text>
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-                </View>
+            <ScrollView
+                onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
 
-                <WebView
-                    source={{html: html}}
-                    style={{
-                        backgroundColor: 'white'
-                    }}
-                    geolocationEnabled={true}
-                    key={this.state.key}
-                />
-            </View>
+                <MenuDrawer
+                    open={this.state.open}
+                    drawerContent={this.drawerContent()}
+                    drawerPercentage={50}
+                    animationTime={50}
+                    overlay={true}
+                    opacity={0.3}>
+
+                    <View style={styles.header}>
+                        <View>
+                            <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                                <View>
+                                    <Image
+                                        style={styles.menu}
+                                        source={require('../../../img/menu.png')}
+                                    />
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <View>
+                            <TouchableWithoutFeedback>
+                                <View>
+                                    <Text style={styles.textLarge}>
+                                        Google Maps API Demo
+                                    </Text>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <View>
+                            <TouchableHighlight
+                                underlayColor='darkblue'>
+                                <View>
+                                    <Text style={styles.textSmall}>
+                                    </Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+
+                    {loader}
+
+
+
+
+                    <View style={{
+                        flex:1,
+                        marginTop: 0
+                    }}>
+
+                        <WebView
+                            source={{html: html}}
+                            style={{
+                                backgroundColor: 'white'
+                            }}
+                            geolocationEnabled={true}
+                            key={this.state.key}
+                        />
+                    </View>
+                </MenuDrawer>
+            </ScrollView>
+
+    </View>
         )
     }
 }
@@ -304,6 +427,8 @@ const styles = StyleSheet.create({
     loader: {
         justifyContent: 'center',
         height: 100,
+        marginBottom: 100,
+        zIndex: 100
     },
     error: {
         color: 'red',
@@ -314,6 +439,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 14,
         marginTop: 16,
+    },
+    layoutText: {
+        color: 'white',
+        marginTop: 20,
+        fontWeight: 'bold',
+        fontSize: 15,
+        textAlign: 'center'
+    },
+    buttonText: {
+        fontSize: 20,
+        textAlign: 'center',
+        padding: 15,
+        marginTop: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        backgroundColor: 'darkblue'
     },
 });
 
