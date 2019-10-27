@@ -78,6 +78,16 @@ class Map extends Component {
         this.setState({open: true});
     }
 
+    drawLines() {
+        this.setState({open: false});
+        this.webView.postMessage( 'Draw');
+    }
+
+    getPos() {
+        this.setState({open: false});
+        this.webView.postMessage( 'Pos');
+    }
+
     menuClose() {
         this.setState({open: false});
     }
@@ -99,6 +109,22 @@ class Map extends Component {
                     style={styles.button}>
                     <Text style={styles.buttonText}>
                         Reload
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this.drawLines()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Draw lines
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this.getPos()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Get position
                     </Text>
                 </TouchableHighlight>
 
@@ -126,11 +152,11 @@ class Map extends Component {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 </head>
 <div>
-        <button onClick="getPos()" style="border-radius: 10px; width: 70px; height: 45px; font-size: 12px; font-weight: bold; position: absolute; top: 10px; right: 5px; z-index: 100">Get 
+<!--        <button onClick="getPos()" style="border-radius: 10px; width: 70px; height: 45px; font-size: 12px; font-weight: bold; position: absolute; top: 10px; right: 5px; z-index: 100">Get 
         </button>
 
         <button onClick="showRoutes()" style="border-radius: 10px; width: 70px; height: 45px; font-size: 12px; font-weight: bold; position: absolute; top: 10px; right: 75px; z-index: 100">Set
-        </button>
+        </button>-->
 </div>
 
 
@@ -139,8 +165,14 @@ class Map extends Component {
 </div>
 
 <script type="text/javascript">
+    document.addEventListener("message", function(event) {
+        switch (event.data) {
+        case 'Draw' : showRoutes(); break;
+        case 'Pos' : getPos(); break;
+        }
+    }, false);
+
     var locations = [${this.state.locationsList}];
-    
     var symbolOne = {
                     path: 'M -2,0 0,-2 2,0 0,2 z',
                     strokeColor: 'gold',
@@ -304,6 +336,8 @@ class Map extends Component {
                         style={{
                             backgroundColor: 'white'
                         }}
+                        ref={( webView ) => this.webView = webView}
+                        onMessage={(event)=> console.log(event.nativeEvent.data)}
                         geolocationEnabled={true}
                     />
                 </MenuDrawer>
