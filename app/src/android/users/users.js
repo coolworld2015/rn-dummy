@@ -13,6 +13,7 @@ import {
     Image,
     Dimensions,
     RefreshControl,
+    DrawerLayoutAndroid
 } from 'react-native';
 
 import ListView from 'deprecated-react-native-listview';
@@ -195,7 +196,20 @@ class Users extends Component {
     }
 
     onMenu() {
-        //appConfig.drawer.openDrawer();
+        this.refs['DRAWER_REF'].openDrawer();
+    }
+
+    menuClose() {
+        this.refs['DRAWER_REF'].closeDrawer();
+    }
+
+    refGetItems() {
+        this.setState({
+            showProgress: true,
+            resultsCount: 0,
+        });
+        this.getItems();
+        this.refs['DRAWER_REF'].closeDrawer();
     }
 
     render() {
@@ -228,95 +242,134 @@ class Users extends Component {
             />;
         }
 
-        return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <View>
-                        <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
-                            <View>
-                                <Image
-                                    style={styles.menu}
-                                    source={require('../../../img/menu.png')}
-                                />
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                    <View>
-                        <TouchableWithoutFeedback>
-                            <View>
-                                <Text style={styles.textLarge}>
-                                    Rest API Demo
-                                </Text>
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                    <View>
-                        <TouchableHighlight
-                            onPress={() => this.addItem()}
-                            underlayColor='darkblue'>
-                            <View>
-                                <Text style={styles.textSmall}>
-                                    New
-                                </Text>
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-                </View>
+        let navigationView = (
+            <View style={{flex: 1, backgroundColor: 'black'}}>
+                <Text style={styles.layoutText}  onPress={() => this.menuClose()}>
+                    Rest API Demo
+                </Text>
 
-                <View style={styles.iconForm}>
-                    <View>
-                        <TextInput
-                            underlineColorAndroid='rgba(0,0,0,0)'
-                            onChangeText={this.onChangeText.bind(this)}
-                            style={styles.searchLarge}
-                            value={this.state.searchQuery}
-                            placeholderTextColor='gray'
-                            placeholder='Search here'>
-                        </TextInput>
+                <TouchableHighlight
+                    onPress={() => this.refGetItems()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Reload
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this._handlePress2()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Page 2
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this._handlePress3()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Page 3
+                    </Text>
+                </TouchableHighlight>
+            </View>
+        );
+
+        return (
+            <DrawerLayoutAndroid
+                ref={'DRAWER_REF'}
+                drawerWidth={200}
+                drawerPosition={DrawerLayoutAndroid.positions.Left}
+                renderNavigationView={() => navigationView}>
+
+                <View style={styles.container}>
+                    <View style={styles.header}>
+                        <View>
+                            <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                                <View>
+                                    <Image
+                                        style={styles.menu}
+                                        source={require('../../../img/menu.png')}
+                                    />
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <View>
+                            <TouchableWithoutFeedback>
+                                <View>
+                                    <Text style={styles.textLarge}>
+                                        Rest API Demo
+                                    </Text>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <View>
+                            <TouchableHighlight
+                                onPress={() => this.addItem()}
+                                underlayColor='darkblue'>
+                                <View>
+                                    <Text style={styles.textSmall}>
+                                        New
+                                    </Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
                     </View>
-                    <View style={styles.searchSmall}>
+
+                    <View style={styles.iconForm}>
+                        <View>
+                            <TextInput
+                                underlineColorAndroid='rgba(0,0,0,0)'
+                                onChangeText={this.onChangeText.bind(this)}
+                                style={styles.searchLarge}
+                                value={this.state.searchQuery}
+                                placeholderTextColor='gray'
+                                placeholder='Search here'>
+                            </TextInput>
+                        </View>
+                        <View style={styles.searchSmall}>
+                            <TouchableWithoutFeedback
+                                onPress={() => this.clearSearchQuery()}>
+                                <View>
+                                    {image}
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                    </View>
+
+                    {errorCtrl}
+
+                    {loader}
+
+                    <ScrollView
+                        onScroll={this.refreshData.bind(this)}
+                        scrollEventThrottle={16}
+                        refreshControl={
+                            <RefreshControl
+                                enabled={true}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.refreshDataAndroid.bind(this)}
+                            />
+                        }>
+                        <ListView
+                            style={styles.scroll}
+                            enableEmptySections={true}
+                            dataSource={this.state.dataSource}
+                            renderRow={this.renderRow.bind(this)}
+                        />
+                    </ScrollView>
+
+                    <View>
                         <TouchableWithoutFeedback
                             onPress={() => this.clearSearchQuery()}>
                             <View>
-                                {image}
+                                <Text style={styles.countFooter}>
+                                    Records: {this.state.resultsCount}
+                                </Text>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
                 </View>
-
-                {errorCtrl}
-
-                {loader}
-
-                <ScrollView
-                    onScroll={this.refreshData.bind(this)}
-                    scrollEventThrottle={16}
-                    refreshControl={
-                        <RefreshControl
-                            enabled={true}
-                            refreshing={this.state.refreshing}
-                            onRefresh={this.refreshDataAndroid.bind(this)}
-                        />
-                    }>
-                    <ListView
-                        style={styles.scroll}
-                        enableEmptySections={true}
-                        dataSource={this.state.dataSource}
-                        renderRow={this.renderRow.bind(this)}
-                    />
-                </ScrollView>
-
-                <View>
-                    <TouchableWithoutFeedback
-                        onPress={() => this.clearSearchQuery()}>
-                        <View>
-                            <Text style={styles.countFooter}>
-                                Records: {this.state.resultsCount}
-                            </Text>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </View>
-            </View>
+            </DrawerLayoutAndroid>
         );
     }
 }
@@ -420,6 +473,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 14,
         marginTop: 16,
+    },
+    layoutText: {
+        color: 'white',
+        margin: 10,
+        fontWeight: 'bold',
+        fontSize: 15,
+        textAlign: 'left'
+    },
+    buttonText: {
+        fontSize: 20,
+        textAlign: 'center',
+        margin: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        backgroundColor: 'darkblue'
     },
 });
 
