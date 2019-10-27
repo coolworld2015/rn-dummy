@@ -120,14 +120,6 @@ class Map extends Component {
                     </Text>
                 </TouchableHighlight>
 
-                {/*<TouchableHighlight
-                    onPress={() => this.menuAddItem()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        New
-                    </Text>
-                </TouchableHighlight>*/}
-
                 <TouchableHighlight
                     onPress={() => this.menuClose()}
                     style={styles.button}>
@@ -270,57 +262,49 @@ class Map extends Component {
 
         return (
             <View style={styles.container}>
-            <ScrollView
-                onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
+                <ScrollView
+                    onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
 
-                <MenuDrawer
-                    open={this.state.open}
-                    drawerContent={this.drawerContent()}
-                    drawerPercentage={50}
-                    animationTime={50}
-                    overlay={true}
-                    opacity={0.3}>
+                    <MenuDrawer
+                        open={this.state.open}
+                        drawerContent={this.drawerContent()}
+                        drawerPercentage={50}
+                        animationTime={50}
+                        overlay={true}
+                        opacity={0.3}>
 
-                    <View style={styles.header}>
-                        <View>
-                            <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
-                                <View>
-                                    <Image
-                                        style={styles.menu}
-                                        source={require('../../../img/menu.png')}
-                                    />
-                                </View>
-                            </TouchableWithoutFeedback>
+                        <View style={styles.header}>
+                            <View>
+                                <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                                    <View>
+                                        <Image
+                                            style={styles.menu}
+                                            source={require('../../../img/menu.png')}
+                                        />
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                            <View>
+                                <TouchableWithoutFeedback>
+                                    <View>
+                                        <Text style={styles.textLarge}>
+                                            Google Maps API Demo
+                                        </Text>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                            <View>
+                                <TouchableHighlight
+                                    underlayColor='darkblue'>
+                                    <View>
+                                        <Text style={styles.textSmall}>
+                                        </Text>
+                                    </View>
+                                </TouchableHighlight>
+                            </View>
                         </View>
-                        <View>
-                            <TouchableWithoutFeedback>
-                                <View>
-                                    <Text style={styles.textLarge}>
-                                        Google Maps API Demo
-                                    </Text>
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                        <View>
-                            <TouchableHighlight
-                                underlayColor='darkblue'>
-                                <View>
-                                    <Text style={styles.textSmall}>
-                                    </Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-                    </View>
 
-                    {loader}
-
-
-
-
-                    <View style={{
-                        flex:1,
-                        marginTop: 0
-                    }}>
+                        {loader}
 
                         <WebView
                             source={{html: html}}
@@ -330,11 +314,10 @@ class Map extends Component {
                             geolocationEnabled={true}
                             key={this.state.key}
                         />
-                    </View>
-                </MenuDrawer>
-            </ScrollView>
 
-    </View>
+                    </MenuDrawer>
+                </ScrollView>
+            </View>
         )
     }
 }
