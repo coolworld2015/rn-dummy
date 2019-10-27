@@ -256,7 +256,7 @@ class Users extends Component {
                     </Text>
                 </TouchableHighlight>
 
-                <TouchableHighlight
+{/*                <TouchableHighlight
                     onPress={() => this._handlePress2()}
                     style={styles.button}>
                     <Text style={styles.buttonText}>
@@ -270,7 +270,7 @@ class Users extends Component {
                     <Text style={styles.buttonText}>
                         Page 3
                     </Text>
-                </TouchableHighlight>
+                </TouchableHighlight>*/}
             </View>
         );
 
@@ -479,12 +479,12 @@ const styles = StyleSheet.create({
         margin: 10,
         fontWeight: 'bold',
         fontSize: 15,
-        textAlign: 'left'
+        textAlign: 'center'
     },
     buttonText: {
         fontSize: 20,
         textAlign: 'center',
-        margin: 20,
+        padding: 20,
         fontWeight: 'bold',
         color: 'white',
         backgroundColor: 'darkblue'
