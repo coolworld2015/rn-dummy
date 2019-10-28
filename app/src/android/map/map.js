@@ -59,7 +59,8 @@ class Map extends Component {
         this.setState({
             showProgress: true,
             key: this.state.key + 1,
-            locationsList: `
+            locationsList: '',
+            locationsList1: `
             ['Point1', 49.093086, 8.533068, 1],
             ['Point2', 49.147995, 8.559998, 2],
             ['Point3', 49.116544, 8.551161, 3],
@@ -88,6 +89,16 @@ class Map extends Component {
         this.webView.postMessage( 'Pos');
     }
 
+    setData() {
+        this.setState({open: false});
+        let locationsList = [['Point1', 49.093086, 8.533068, 1],
+            ['Point2', 49.147995, 8.559998, 2],
+            ['Point3', 49.116544, 8.551161, 3],
+            ['Point4', 49.166744, 8.551161, 4],
+            ['Point5', 49.176844, 8.551161, 5]];
+        this.webView.postMessage(JSON.stringify(locationsList));
+    }
+
     menuClose() {
         this.setState({open: false});
     }
@@ -109,6 +120,14 @@ class Map extends Component {
                     style={styles.button}>
                     <Text style={styles.buttonText}>
                         Reload
+                    </Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={() => this.setData()}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>
+                        Set Data
                     </Text>
                 </TouchableHighlight>
 
@@ -169,6 +188,7 @@ class Map extends Component {
         switch (event.data) {
         case 'Draw' : showRoutes(); break;
         case 'Pos' : getPos(); break;
+        default: locations = JSON.parse(event.data); setData();
         }
     }, false);
 
@@ -222,7 +242,8 @@ class Map extends Component {
     
     var infowindow = new google.maps.InfoWindow();
 
-    for (i = 0; i < locations.length; i++) {
+    function setData() {
+      for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
             map: map
@@ -234,7 +255,10 @@ class Map extends Component {
                 infowindow.open(map, marker);
             }
         })(marker, i));
+        }
     }
+    
+    setData();
 
     function getPos() {
             if (navigator.geolocation) {

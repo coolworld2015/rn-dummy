@@ -212,7 +212,7 @@ class Map extends Component {
         switch (event.data) {
         case 'Draw' : showRoutes(); break;
         case 'Pos' : getPos(); break;
-        default: locations =  JSON.parse(event.data); setData();
+        default: locations = JSON.parse(event.data); setData();
         }
     }, false);
 
