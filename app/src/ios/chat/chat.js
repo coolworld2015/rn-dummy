@@ -68,15 +68,15 @@ class Chat extends Component {
 
             if (messageObject.split('###')[0] !== 'still alive' && appConfig.socket.name !== messageObject.split('###')[1]) {
                 let message = messageObject.split('###')[1] + ': ' + messageObject.split('###')[0];
-                Alert.alert('Message: ', message)
-                PushNotificationIOS.presentLocalNotification({
+                //Alert.alert('Message: ', message)
+                /*PushNotificationIOS.presentLocalNotification({
                     alertBody: 'Hello notification'
                 });
                 PushNotificationIOS.localNotificationSchedule({
                     //message: "New Message", // (required)
                     message: messageObject.split('###')[1] + ': ' + messageObject.split('###')[0],
                     date: new Date(Date.now() + (0 * 1000)) // in 60 secs
-                });
+                });*/
             }
         };
     }
