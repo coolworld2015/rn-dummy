@@ -188,6 +188,7 @@
         data() {
             return {
                 map: '',
+                items: [],
                 symbolOne: {
                     path: 'M -2,0 0,-2 2,0 0,2 z',
                     strokeColor: 'gold',
@@ -221,12 +222,45 @@
         },
         created() {
             setTimeout(this.init, 500);
+
             appConfig.$on('pos', searchQuery => {
                 this.getPos();
             });
             appConfig.$on('locBlanco', searchQuery => {
                 this.locBlanco();
             });
+
+            Notification.requestPermission().then(function(result) {
+                /*let notification = new Notification('VU-Demo', {
+                    icon: '../img/logo.jpg',
+                    body: 'Hey there! Chat is started!',
+                });*/
+            });
+
+            if (window.ws === undefined) {
+                window.ws = new WebSocket('wss://jwt-chat.herokuapp.com');
+            }
+
+            ws.onmessage = (e) => {
+                let messageObject = e.data;
+                if (messageObject.split('###')[0] !== 'still alive') {
+                    this.items.unshift({
+                        id: +new Date(),
+                        name: messageObject.split('###')[1],
+                        date: messageObject.split('###')[2],
+                        message: messageObject.split('###')[0]
+                    });
+
+                    let notification = new Notification('VU-Demo', {
+                        icon: '../img/logo.jpg',
+                        body: messageObject.split('###')[0],
+                    });
+
+                    if (messageObject.split('###')[0] === 'Blanco') {
+                        appConfig.$emit('locBlanco',{});
+                    }
+                }
+            };
         },
         methods: {
             init() {
