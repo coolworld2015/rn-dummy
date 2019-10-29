@@ -6,6 +6,7 @@
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
 
@@ -229,6 +230,9 @@
         },
         created() {
             setTimeout(this.init, 500);
+            setTimeout(this.getItems, 1000);
+
+            this.fetchData();
 
             appConfig.$on('init', searchQuery => {
                 this.init();
@@ -246,7 +250,7 @@
                 this.locBlanco();
             });
 
-            Notification.requestPermission().then(function(result) {
+            Notification.requestPermission().then(function (result) {
                 /*let notification = new Notification('VU-Demo', {
                     icon: '../img/logo.jpg',
                     body: 'Hey there! Chat is started!',
@@ -273,17 +277,82 @@
                     });
 
                     switch (messageObject.split('###')[0].toLowerCase()) {
-                        case 'reload': appConfig.$emit('init',{}); break;
-                        case 'set': appConfig.$emit('set',{}); break;
-                        case 'show': appConfig.$emit('show',{}); break;
-                        case 'get': appConfig.$emit('get',{}); break;
-                        case 'blanco': appConfig.$emit('locBlanco',{}); break;
+                        case 'reload':
+                            appConfig.$emit('init', {});
+                            break;
+                        case 'set':
+                            appConfig.$emit('set', {});
+                            break;
+                        case 'show':
+                            appConfig.$emit('show', {});
+                            break;
+                        case 'get':
+                            appConfig.$emit('get', {});
+                            break;
+                        case 'blanco':
+                            appConfig.$emit('locBlanco', {});
+                            break;
                     }
 
                 }
             };
         },
         methods: {
+            fetchData() {
+                //this.$http.post('https://213.144.11.162:10380/authentication?grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-')
+
+
+
+               /* this.$http.post('https://213.144.11.162:10380/authentication?grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-', {
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    }})*/
+
+                $.ajax({
+                    url: 'https://213.144.11.162:10380/authentication',
+                    type: "POST",
+                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    success: function (data, textStatus) {
+                        console.log(data)
+                        window.access_token = 'Bearer ' + data.access_token;
+                    }
+                });
+
+               /* this.$http.post('https://213.144.11.162:10380/authentication',{
+                    body: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+                })*/
+
+
+            },
+            getItems() {
+                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData',{
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        console.log(result)
+                        //this.items = JSON.parse(result.data);
+                        //this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
             init() {
                 map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 13,
