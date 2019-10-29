@@ -7,7 +7,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcEkMFV_WyhNdZrr8VLaCYOw4FP75u748"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
 
 <style>
     ::-webkit-scrollbar {
@@ -152,14 +152,20 @@
         <ul>
             <a href="" class="closebtn" onclick="event.preventDefault();closeNav()"> &times;</a>
 
-            <li v-on:click="changeRoute('map')" v-bind:class="{ active: map }">
+            <li v-on:click="emitEvent('init')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
 
-            <li v-on:click="emitEvent('pos')" v-bind:class="{ active: pos }">
-                <i class="fa fa-fw fa-map-marker"></i><span style="margin: 15px;">Position</span></li>
+            <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }">
+                <i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span></li>
+
+            <li v-on:click="emitEvent('show')" v-bind:class="{ active: pos }">
+                <i class="fas fa-route"></i><span style="margin: 15px;">Show routes</span></li>
+
+            <li v-on:click="emitEvent('get')" v-bind:class="{ active: pos }">
+                <i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span></li>
 
             <li v-on:click="emitEvent('locBlanco')" v-bind:class="{ active: pos }">
-                <i class="fa fa-fw fa-map-marker"></i><span style="margin: 15px;">Blanco</span></li>
+                <i class="fas fa-warehouse"></i><span style="margin: 15px;">Blanco</span></li>
         </ul>
     </div>
 
@@ -199,6 +205,7 @@
                 image: '../img/blue-circle.png',
                 truck: '../img/truck.png',
                 truck_f: '../img/truck_f.png',
+                truck_long: '../img/truck-long.png',
                 locations: [
                     ['<div style="margin: 0px; color: black"><img src="../img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
                     ['Point2', 49.147995, 8.559998, 2],
@@ -223,7 +230,16 @@
         created() {
             setTimeout(this.init, 500);
 
-            appConfig.$on('pos', searchQuery => {
+            appConfig.$on('init', searchQuery => {
+                this.init();
+            });
+            appConfig.$on('set', searchQuery => {
+                this.setPoints();
+            });
+            appConfig.$on('show', searchQuery => {
+                this.showRoutes();
+            });
+            appConfig.$on('get', searchQuery => {
                 this.getPos();
             });
             appConfig.$on('locBlanco', searchQuery => {
@@ -256,9 +272,14 @@
                         body: messageObject.split('###')[0],
                     });
 
-                    if (messageObject.split('###')[0] === 'Blanco') {
-                        appConfig.$emit('locBlanco',{});
+                    switch (messageObject.split('###')[0].toLowerCase()) {
+                        case 'reload': appConfig.$emit('init',{}); break;
+                        case 'set': appConfig.$emit('set',{}); break;
+                        case 'show': appConfig.$emit('show',{}); break;
+                        case 'get': appConfig.$emit('get',{}); break;
+                        case 'blanco': appConfig.$emit('locBlanco',{}); break;
                     }
+
                 }
             };
         },
@@ -279,8 +300,6 @@
                     map: map
                 });
                 appConfig.map = true;
-                this.setPoints();
-                this.showRoutes()
             },
             locBlanco() {
                 map = new google.maps.Map(document.getElementById('map'), {
@@ -293,7 +312,7 @@
                 marker = new google.maps.Marker({
                     position: new google.maps.LatLng(49.1242421, 8.5586618),
                     draggable: true,
-                    title: 'Truck 12345',
+                    title: 'Truck 1',
                     //animation: google.maps.Animation.BOUNCE,
                     icon: this.truck,
                     map: map
@@ -302,9 +321,18 @@
                 marker1 = new google.maps.Marker({
                     position: new google.maps.LatLng(49.1232625, 8.5555243),
                     draggable: true,
-                    title: 'Truck 12345',
+                    title: 'Truck 2',
                     //animation: google.maps.Animation.BOUNCE,
                     icon: this.truck_f,
+                    map: map
+                });
+
+                marker2 = new google.maps.Marker({
+                    position: new google.maps.LatLng(49.124633, 8.5552671),
+                    draggable: true,
+                    title: 'Truck 3',
+                    //animation: google.maps.Animation.BOUNCE,
+                    icon: this.truck_long,
                     map: map
                 });
 
@@ -318,10 +346,12 @@
                     infowindow.setContent('<h3>Truck 2 - Docked &nbsp&nbsp</h3>');
                     infowindow.open(map, marker1);
                 });
+                google.maps.event.addListener(marker2, 'click', function () {
+                    infowindow.setContent('<h3>Truck 3 - Wating &nbsp&nbsp</h3>');
+                    infowindow.open(map, marker2);
+                });
 
                 appConfig.map = true;
-                //this.setPoints();
-                //this.showRoutes()
             },
             setPoints() {
                 var infowindow = new google.maps.InfoWindow();
