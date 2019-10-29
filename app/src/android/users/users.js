@@ -153,8 +153,10 @@ class Users extends Component {
         recordsCount = this.state.recordsCount;
         positionY = this.state.positionY;
         items = this.state.filteredItems.slice(0, recordsCount);
+console.log(event.nativeEvent.contentOffset.y)
+console.log('Y ', positionY - 10)
 
-        if (event.nativeEvent.contentOffset.y >= positionY - 10) {
+        if (event.nativeEvent.contentOffset.y >= positionY - 100) {
             this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(items),
                 recordsCount: recordsCount + 10,

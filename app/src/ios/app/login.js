@@ -20,8 +20,8 @@ class Login extends Component {
 
         this.state = {
             showProgress: false,
-            username: '',
-            password: '',
+            username: '2',
+            password: '2',
             bugANDROID: '',
             width: Dimensions.get('window').width
         }
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
         flex: 1,
-        marginTop: 100
+        marginTop: 50
     },
     logo: {
         width: 150,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     loader: {
-        marginTop: 20
+        marginTop: 40
     },
     error: {
         color: 'red',

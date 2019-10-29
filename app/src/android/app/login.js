@@ -20,8 +20,8 @@ class Login extends Component {
 
         this.state = {
             showProgress: false,
-            username: '',
-            password: '',
+            username: '1',
+            password: '1',
             bugANDROID: '',
             width: Dimensions.get('window').width
         }
