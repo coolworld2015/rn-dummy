@@ -230,7 +230,9 @@
         },
         created() {
             setTimeout(this.init, 500);
-            setTimeout(this.getItems, 1000);
+            setTimeout(this.getAllCars, 1000);
+            setTimeout(this.getCar, 2000);
+            setTimeout(this.getAllPositions, 3000);
 
             this.fetchData();
 
@@ -299,16 +301,6 @@
         },
         methods: {
             fetchData() {
-                //this.$http.post('https://213.144.11.162:10380/authentication?grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-')
-
-
-
-               /* this.$http.post('https://213.144.11.162:10380/authentication?grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-', {
-                    headers: {
-                        'Accept': 'application/x-www-form-urlencoded',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    }})*/
-
                 $.ajax({
                     url: 'https://213.144.11.162:10380/authentication',
                     type: "POST",
@@ -322,16 +314,55 @@
                         window.access_token = 'Bearer ' + data.access_token;
                     }
                 });
-
-               /* this.$http.post('https://213.144.11.162:10380/authentication',{
-                    body: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
-                })*/
-
-
             },
-            getItems() {
-                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData',{
+            getAllCars() {
+                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        console.log(result)
+                        //this.items = JSON.parse(result.data);
+                        //this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getCar() {
+                this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetSpecificVehicleData?vehicleOid=37069743473', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        console.log(result)
+                        //this.items = JSON.parse(result.data);
+                        //this.filteredItems = JSON.parse(result.data);
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getAllPositions() {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
