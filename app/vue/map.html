@@ -299,6 +299,14 @@
                     icon: this.symbolOne,
                     map: map
                 });
+
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(49.124888, 8.552490),
+                    draggable: true,
+                    icon: this.image,
+                    map: map
+                });
+
                 appConfig.map = true;
             },
             locBlanco() {
