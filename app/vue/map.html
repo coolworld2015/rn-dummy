@@ -170,6 +170,9 @@
 
             <li v-on:click="changeRoute('vehicles')" v-bind:class="{ active: vehicles }">
                 <i class="fas fa-truck"></i><span style="margin: 15px;">Vehicles</span></li>
+
+            <li v-on:click="changeRoute('positions')" v-bind:class="{ active: positions }">
+                <i class="fas fa-globe"></i><span style="margin: 15px;">Positions</span></li>
         </ul>
     </div>
 
@@ -202,6 +205,16 @@
                     </div>`
     };
     const VehicleShow = {template: '<vehicle-show></vehicle-show>'};
+
+    const Positions = {
+        template: `
+                    <div>
+                        <div class="top"><top></top></div>
+                            <positions-items></positions-items>
+                        <div class="bottom"><bottom></bottom></div>
+                    </div>`
+    };
+    const PositionShow = {template: '<position-show></position-show>'};
 
     Vue.component('top', {
         template: `<div>
@@ -810,11 +823,199 @@
         },
     });
 
+    Vue.component('positions-items', {
+        template: `<div>
+        <div v-if="loading">
+            <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                <img src="./loading.gif" alt="">
+            </div>
+        </div>
+        <div v-if="!loading">
+            <div style="margin-top: 100px;margin-bottom: 50px;">
+                <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.vehicleOid }} - {{ item.lat }} - {{ item.lng }} - {{ item.dateTimeOfRecording }}</li></ul>
+            </div>
+        </div>
+        <div v-if="error">
+            Server error - try again
+        </div>
+        </div>`,
+        data: function () {
+            return {
+                items: [],
+                searchQuery: '',
+                filteredItems: [],
+                loading: true,
+                error: false,
+            }
+        },
+        created() {
+            this.getToken();
+            setTimeout(this.getAllPositions, 1000);
+
+            appConfig.$on('searchQueryVehicles', searchQuery => {
+                let arr = [].concat(appConfig.items);
+                let items = arr.filter((el) => el.vehicleId.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1);
+                this.filteredItems = items;
+                this.items = items;
+
+                appConfig.$emit('itemsCount', items.length);
+                if (searchQuery === '') {
+                    this.items = appConfig.items;
+                    this.filteredItems = appConfig.items;
+                }
+            });
+        },
+        methods: {
+            getAllPositions() {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        console.log(result)
+                        this.items = result.data;
+                        this.filteredItems = result.data;
+                        appConfig.items = this.filteredItems;
+                        this.loading = false;
+                        appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            showDetails(item) {
+                appConfig.item = item;
+                this.$router.push('vehicle-show');
+            },
+            getToken() {
+                $.ajax({
+                    url: 'https://213.144.11.162:10380/authentication',
+                    type: "POST",
+                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    success: function (data, textStatus) {
+                        console.log(data)
+                        window.access_token = 'Bearer ' + data.access_token;
+                    }
+                });
+            }
+        }
+    });
+    Vue.component('position-show', {
+        props: ['item'],
+        template: `<div style="text-align: center;margin-top: 120px;">
+            <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
+                {{ title }}
+            </div>
+
+            <span style="font-size: 24px; color: black;"></span>
+            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            v-model="id"><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Name"
+            v-on:keypress="clearWarning"
+            v-model="name" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Age"
+            v-on:keypress="clearWarning"
+            v-model="phone" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="address" ><br>
+
+            <span style="font-size: 24px; color: black;margin-left: 0px;">
+            </span>
+            <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
+            placeholder="Salary"
+            v-on:keypress="clearWarning"
+            v-model="index" ><br>
+
+            <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
+                <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
+            </div>
+
+            <button style="font-size: 24px;height: 50px;width: 150px;border-radius: 5px;background: #01579B;color: white;outline:none;margin-top: 20px;"
+            v-on:click="goBack">
+                Back
+            </button>
+
+            <div v-if="loading">
+                <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
+                    <img src="./loading.gif" alt="">
+                </div>
+            </div>
+
+            <div v-if="error" style="margin-top: 25px;">
+                Server error - try again
+            </div>
+        </div>`,
+        data: function () {
+            return {
+                id: '',
+                title: '',
+                name: '',
+                phone: '',
+                address: '',
+                index: '',
+                invalidValue: false,
+                error: false,
+                loading: false,
+            };
+        },
+        created() {
+            if (!appConfig.item) {
+                this.$router.push('/vehicles');
+            } else {
+                this.init();
+            }
+        },
+        methods: {
+            init() {
+                this.id = appConfig.item.vehicleOid;
+                this.title = appConfig.item.vehicleId;
+                this.name = appConfig.item.vehicleId;
+                this.phone = appConfig.item.vin;
+                this.index = appConfig.item.guid;
+                this.address = appConfig.item.version;
+                appConfig.$emit('itemsCount', 1);
+            },
+            goBack() {
+                this.$router.push('/vehicles');
+            },
+            clearWarning() {
+                this.invalidValue = false;
+            },
+        },
+    });
+
     const routes = [
         {path: '/', component: GoogleMap},
         {path: '/map', component: GoogleMap},
+
         {path: '/vehicles', component: Vehicles},
         {path: '/vehicle-show', component: VehicleShow},
+
+        {path: '/positions', component: Positions},
+        {path: '/position-show', component: PositionShow},
     ];
 
     const router = new VueRouter({
@@ -827,7 +1028,8 @@
         data: {
             map: false,
             pos: '',
-            vehicles: ''
+            vehicles: '',
+            positions: ''
         },
         created() {
             this.init();
@@ -835,7 +1037,8 @@
         methods: {
             init() {
                 this.map = appConfig.route === 'map';
-                this.phones = appConfig.route === 'phones';
+                this.vehicles = appConfig.route === 'vehicles';
+                this.positions = appConfig.route === 'positions';
             },
             changeRoute(route) {
                 closeNav();
