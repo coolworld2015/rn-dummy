@@ -348,16 +348,17 @@
             setTimeout(this.init, 500);
             /*setTimeout(this.getAllCars, 1000);
             setTimeout(this.getCar, 2000);
-            setTimeout(this.getAllPositions, 3000);
             */
 
             this.getToken();
+            //setTimeout(this.getAllPositions, 2000);
 
             appConfig.$on('init', searchQuery => {
                 this.init();
             });
             appConfig.$on('set', searchQuery => {
-                this.setPoints();
+                //this.setPoints();
+                this.getAllPositions();
             });
             appConfig.$on('show', searchQuery => {
                 this.showRoutes();
@@ -488,12 +489,46 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        console.log(result)
-                        //this.items = JSON.parse(result.data);
-                        //this.filteredItems = JSON.parse(result.data);
-                        appConfig.items = this.filteredItems;
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
+                        this.items = result.data.splice(0, 5000);
+                        let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
+                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng])
+                        console.log(locations)
+
+                        var infowindow = new google.maps.InfoWindow();
+                        for (var i = 0; i < this.items.length; i++) {
+                            marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                                map: map
+                            });
+
+                            var locs = [].concat(locations);
+                            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                                return function () {
+                                    infowindow.setContent(locs[i][0]);
+                                    infowindow.open(map, marker);
+                                }
+                            })(marker, i));
+
+                            /*let path = [];
+                            this.items.forEach((item) => {
+                                let obj = {}
+                                obj.lat = item.lat;
+                                obj.lng = item.lng;
+                                path.push(obj)
+                            });
+                            console.log(path)*/
+
+
+                            /*this.flightPath = new google.maps.Polyline({
+                                path: path,
+                                geodesic: true,
+                                strokeColor: '#01579B',
+                                strokeOpacity: 1.0,
+                                strokeWeight: 6
+                            });
+                            this.flightPath.setMap(map);*/
+
+                        }
                     })
                     .catch(error => {
                         console.log(error)
