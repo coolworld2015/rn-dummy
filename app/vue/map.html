@@ -716,7 +716,7 @@
                 <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.vehicleOid }} - {{ item.vehicleId }} - {{ item.guid }} - {{ item.vin }}</li></ul>
             </div>
         </div>
-        <div v-if="error">
+        <div v-if="error" style="color: red">
             Server error - try again
         </div>
         </div>`,
@@ -745,8 +745,35 @@
                     this.filteredItems = appConfig.items;
                 }
             });
+
+            window.addEventListener('jq_error', () => {
+                this.loading = false;
+                this.error = true;
+            });
         },
         methods: {
+            getToken() {
+                $.ajax({
+                    url: 'https://213.144.11.162:10380/authentication',
+                    type: "POST",
+                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    success: function (data, textStatus) {
+                        console.log(data)
+                        window.access_token = 'Bearer ' + data.access_token;
+                    },
+                    error: function (jqXHR) {
+                        console.log(jqXHR)
+                        window.dispatchEvent(new CustomEvent('jq_error', {}))
+                        if (jqXHR.statusText === 'error') {
+                            this.error = true;
+                        }
+                    }
+                });
+            },
             getAllCars() {
                 this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData', {
                     headers: {
@@ -770,39 +797,9 @@
                         this.loading = false;
                     });
             },
-            fetchData() {
-                appConfig.message = 'Loading...';
-                this.$http.get('https://ui-base.herokuapp.com/api/items/get')
-                    .then(result => {
-                        this.items = result.data;
-                        this.filteredItems = result.data;
-                        appConfig.items = this.filteredItems;
-                        this.loading = false;
-                        appConfig.$emit('itemsCount', this.items.length);
-                    })
-                    .catch(error => {
-                        this.error = true;
-                        this.loading = false;
-                    });
-            },
             showDetails(item) {
                 appConfig.item = item;
                 this.$router.push('vehicle-show');
-            },
-            getToken() {
-                $.ajax({
-                    url: 'https://213.144.11.162:10380/authentication',
-                    type: "POST",
-                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
-                    headers: {
-                        'Accept': 'application/x-www-form-urlencoded',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    success: function (data, textStatus) {
-                        console.log(data)
-                        window.access_token = 'Bearer ' + data.access_token;
-                    }
-                });
             }
         }
     });
@@ -915,7 +912,7 @@
                 <ul><li style="color: black;" v-for="item in items" v-on:click="showDetails(item)">{{ item.vehicleOid }} - {{ item.lat }} - {{ item.lng }} - {{ item.dateTimeOfRecording.split('T').join(' ') }}</li></ul>
             </div>
         </div>
-        <div v-if="error">
+        <div v-if="error" style="color: red">
             Server error - try again
         </div>
         </div>`,
@@ -944,8 +941,35 @@
                     this.filteredItems = appConfig.items;
                 }
             });
+
+            window.addEventListener('jq_error', () => {
+                this.loading = false;
+                this.error = true;
+            });
         },
         methods: {
+            getToken() {
+                $.ajax({
+                    url: 'https://213.144.11.162:10380/authentication',
+                    type: "POST",
+                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    success: function (data, textStatus) {
+                        console.log(data)
+                        window.access_token = 'Bearer ' + data.access_token;
+                    },
+                    error: function (jqXHR) {
+                        console.log(jqXHR)
+                        window.dispatchEvent(new CustomEvent('jq_error', {}))
+                        if (jqXHR.statusText === 'error') {
+                            this.error = true;
+                        }
+                    }
+                });
+            },
             getAllPositions() {
                 this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
                     headers: {
@@ -973,21 +997,6 @@
                 appConfig.item = item;
                 this.$router.push('vehicle-show');
             },
-            getToken() {
-                $.ajax({
-                    url: 'https://213.144.11.162:10380/authentication',
-                    type: "POST",
-                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
-                    headers: {
-                        'Accept': 'application/x-www-form-urlencoded',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    success: function (data, textStatus) {
-                        console.log(data)
-                        window.access_token = 'Bearer ' + data.access_token;
-                    }
-                });
-            }
         }
     });
     Vue.component('position-show', {
@@ -1113,6 +1122,7 @@
         },
         created() {
             this.init();
+
         },
         methods: {
             init() {
