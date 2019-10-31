@@ -373,7 +373,7 @@
 
             Notification.requestPermission().then(function (result) {
                 /*let notification = new Notification('VU-Demo', {
-                    icon: '../img/logo.jpg',
+                    icon: '../img/message.jpg',
                     body: 'Hey there! Chat is started!',
                 });*/
             });
@@ -393,7 +393,7 @@
                     });
 
                     let notification = new Notification('VU-Demo', {
-                        icon: './img/logo.jpg',
+                        icon: './img/message.jpg',
                         body: messageObject.split('###')[0],
                     });
 
@@ -410,8 +410,8 @@
                         case 'get':
                             appConfig.$emit('get', {});
                             break;
-                        case 'blanco':
-                            appConfig.$emit('locBlanco', {});
+                        case 'yard':
+                            appConfig.$emit('yard', {});
                             break;
                     }
                 }
@@ -442,7 +442,6 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        console.log(result)
                         //this.items = JSON.parse(result.data);
                         //this.filteredItems = JSON.parse(result.data);
                         appConfig.items = this.filteredItems;
@@ -450,7 +449,6 @@
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
-                        console.log(error)
                         this.error = true;
                         this.loading = false;
                     });
@@ -465,7 +463,6 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        console.log(result)
                         //this.items = JSON.parse(result.data);
                         //this.filteredItems = JSON.parse(result.data);
                         appConfig.items = this.filteredItems;
@@ -473,7 +470,6 @@
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
-                        console.log(error)
                         this.error = true;
                         this.loading = false;
                     });
@@ -488,7 +484,6 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        console.log(result)
                         this.items = result.data;
 
                         let path = [];
@@ -499,11 +494,10 @@
                             obj.date = item.dateTimeOfRecording.split('T')[0];
                             path.push(obj)
                         });
-                        console.log(path.sort(function (a, b) {
-                            // Turn your strings into dates, and then subtract them
-                            // to get a value that is either negative, positive, or zero.
+
+                        path.sort(function (a, b) {
                             return new Date(a.date) - new Date(b.date);
-                        }))
+                        });
 
                         this.flightPath = new google.maps.Polyline({
                             path: path,
@@ -515,7 +509,6 @@
                         this.flightPath.setMap(map);
                     })
                     .catch(error => {
-                        console.log(error)
                         this.error = true;
                         this.loading = false;
                     });
@@ -532,8 +525,7 @@
                     .then(result => {
                         this.items = result.data.splice(0, 5000);
                         let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
-                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng])
-                        console.log(locations)
+                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng]);
 
                         var infowindow = new google.maps.InfoWindow();
                         for (var i = 0; i < this.items.length; i++) {
@@ -549,30 +541,9 @@
                                     infowindow.open(map, marker);
                                 }
                             })(marker, i));
-
-                            /*let path = [];
-                            this.items.forEach((item) => {
-                                let obj = {}
-                                obj.lat = item.lat;
-                                obj.lng = item.lng;
-                                path.push(obj)
-                            });
-                            console.log(path)*/
-
-
-                            /*this.flightPath = new google.maps.Polyline({
-                                path: path,
-                                geodesic: true,
-                                strokeColor: '#01579B',
-                                strokeOpacity: 1.0,
-                                strokeWeight: 6
-                            });
-                            this.flightPath.setMap(map);*/
-
                         }
                     })
                     .catch(error => {
-                        console.log(error)
                         this.error = true;
                         this.loading = false;
                     });
