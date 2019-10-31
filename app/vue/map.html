@@ -156,17 +156,17 @@
             <li v-on:click="changeRoute('map'); emitEvent('init')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
 
-            <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }">
-                <i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span></li>
+            <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }" v-if="map" >
+                <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span></div></li>
 
-            <li v-on:click="emitEvent('show')" v-bind:class="{ active: pos }">
-                <i class="fas fa-route"></i><span style="margin: 15px;">Show routes</span></li>
+            <li v-on:click="emitEvent('show')" v-bind:class="{ active: pos }" v-if="map">
+                <div style="padding-left: 25px;"><i class="fas fa-route"></i><span style="margin: 15px;">Show routes</span></div></li>
 
-            <li v-on:click="emitEvent('get')" v-bind:class="{ active: pos }">
-                <i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span></li>
+            <li v-on:click="emitEvent('yard')" v-bind:class="{ active: pos }" v-if="map">
+                <div style="padding-left: 25px;"><i class="fas fa-warehouse"></i><span style="margin: 15px;">Yard</span></div></li>
 
-            <li v-on:click="emitEvent('locBlanco')" v-bind:class="{ active: pos }">
-                <i class="fas fa-warehouse"></i><span style="margin: 15px;">Blanco</span></li>
+            <li v-on:click="emitEvent('get')" v-bind:class="{ active: pos }" v-if="map">
+                <div style="padding-left: 25px;"><i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span></div></li>
 
             <li v-on:click="changeRoute('vehicles')" v-bind:class="{ active: vehicles }">
                 <i class="fas fa-truck"></i><span style="margin: 15px;">Vehicles</span></li>
@@ -367,8 +367,8 @@
             appConfig.$on('get', searchQuery => {
                 this.getPos();
             });
-            appConfig.$on('locBlanco', searchQuery => {
-                this.locBlanco();
+            appConfig.$on('yard', searchQuery => {
+                this.yard();
             });
 
             Notification.requestPermission().then(function (result) {
@@ -414,7 +414,6 @@
                             appConfig.$emit('locBlanco', {});
                             break;
                     }
-
                 }
             };
         },
@@ -429,7 +428,6 @@
                         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
                     },
                     success: function (data, textStatus) {
-                        console.log(data)
                         window.access_token = 'Bearer ' + data.access_token;
                     }
                 });
@@ -604,7 +602,7 @@
 
                 appConfig.map = true;
             },
-            locBlanco() {
+            yard() {
                 map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 18,
                     center: new google.maps.LatLng(49.1234807, 8.5564619),
@@ -987,7 +985,7 @@
             },
             showDetails(item) {
                 appConfig.item = item;
-                this.$router.push('vehicle-show');
+                this.$router.push('position-show');
             },
         }
     });
@@ -997,10 +995,6 @@
             <div style="font-size: 40px;color: black;font-weight: bolder;margin: 20px;">
                 {{ title }}
             </div>
-
-            <span style="font-size: 24px; color: black;"></span>
-            <input readonly style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
-            v-model="id"><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
             </span>
@@ -1021,14 +1015,14 @@
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="Salary"
             v-on:keypress="clearWarning"
-            v-model="address" ><br>
+            v-model="index" ><br>
 
             <span style="font-size: 24px; color: black;margin-left: 0px;">
             </span>
             <input style="font-size: 24px;height: 50px;padding: 20px;border-radius: 7px;border: 1px solid rgba(0,0,0,.15);margin-top: 2px; margin-bottom: 20px;width: 450px;outline:none;margin-right: 40px;"
             placeholder="Salary"
             v-on:keypress="clearWarning"
-            v-model="index" ><br>
+            v-model="address" ><br>
 
             <div style="font-weight: bold; font-size: 18px; color: #dc3545; margin-bottom: 20px; text-align: center;">
                 <span v-show="invalidValue" style="margin-left: 0px;">Value required - please provide.</span>
@@ -1064,7 +1058,7 @@
         },
         created() {
             if (!appConfig.item) {
-                this.$router.push('/vehicles');
+                this.$router.push('/positions');
             } else {
                 this.init();
             }
@@ -1072,15 +1066,15 @@
         methods: {
             init() {
                 this.id = appConfig.item.vehicleOid;
-                this.title = appConfig.item.vehicleId;
-                this.name = appConfig.item.vehicleId;
-                this.phone = appConfig.item.vin;
-                this.index = appConfig.item.guid;
-                this.address = appConfig.item.version;
+                this.title = appConfig.item.vehicleOid;
+                this.name = appConfig.item.vehicleOid;
+                this.phone = appConfig.item.lat;
+                this.index = appConfig.item.lng;
+                this.address = appConfig.item.dateTimeOfRecording.split('T').join(' ');
                 appConfig.$emit('itemsCount', 1);
             },
             goBack() {
-                this.$router.push('/vehicles');
+                this.$router.push('/positions');
             },
             clearWarning() {
                 this.invalidValue = false;
