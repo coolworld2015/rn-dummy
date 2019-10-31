@@ -319,12 +319,12 @@
                     fillOpacity: 1,
                     scale: 3,
                 },
-                image: '../img/blue-circle.png',
-                truck: '../img/truck.png',
-                truck_f: '../img/truck_f.png',
-                truck_long: '../img/truck-long.png',
+                image: './img/blue-circle.png',
+                truck: './img/truck.png',
+                truck_f: './img/truck_f.png',
+                truck_long: './img/truck-long.png',
                 locations: [
-                    ['<div style="margin: 0px; color: black"><img src="../img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
+                    ['<div style="margin: 0px; color: black"><img src="./img/blue-circle.png" style="margin: 15px; width: 200px"><br><b>Point1</b></div>', 49.093086, 8.533068, 1],
                     ['Point2', 49.147995, 8.559998, 2],
                     ['Point3', 49.116544, 8.551161, 3]
                 ],
@@ -393,7 +393,7 @@
                     });
 
                     let notification = new Notification('VU-Demo', {
-                        icon: '../img/logo.jpg',
+                        icon: './img/logo.jpg',
                         body: messageObject.split('###')[0],
                     });
 
@@ -708,7 +708,7 @@
         template: `<div>
         <div v-if="loading">
             <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
+                <img src="./img/loading.gif" alt="">
             </div>
         </div>
         <div v-if="!loading">
@@ -856,7 +856,7 @@
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                    <img src="./loading.gif" alt="">
+                    <img src="./img/loading.gif" alt="">
                 </div>
             </div>
 
@@ -907,7 +907,7 @@
         template: `<div>
         <div v-if="loading">
             <div style="position: relative; top: 250px; -webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                <img src="./loading.gif" alt="">
+                <img src="./img/loading.gif" alt="">
             </div>
         </div>
         <div v-if="!loading">
@@ -1040,7 +1040,7 @@
 
             <div v-if="loading">
                 <div style="margin-top: -55px;-webkit-box-align:center; -webkit-box-pack:center; display:-webkit-box; font-size:54px">
-                    <img src="./loading.gif" alt="">
+                    <img src="./img/loading.gif" alt="">
                 </div>
             </div>
 
