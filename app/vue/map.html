@@ -515,9 +515,15 @@
                     .then((response) => response.json())
                     .then(result => {
                         let date = new Date;
-                        let now = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+                        var yesterday = date - 1000 * 60 * 60 * 24;
+                        yesterday = new Date(yesterday);
 
-                        this.items = result.data.filter((item) => item.dateTimeOfRecording.split('T')[0] === now);
+                        let now = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+                        let then = yesterday.getFullYear() + '-' + ('0' + (yesterday.getMonth() + 1)).slice(-2) + '-' + ('0' + yesterday.getDate()).slice(-2);
+
+                        this.items = result.data.filter((item) =>
+                            (item.dateTimeOfRecording.split('T')[0] === now) || (item.dateTimeOfRecording.split('T')[0] === then)
+                        );
 
                         let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
                         + item.dateTimeOfRecording.split('T').join(' ') + '<br><br>', item.lat, item.lng, item.vehicleOid]);
