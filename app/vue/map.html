@@ -156,17 +156,25 @@
             <li v-on:click="changeRoute('map'); emitEvent('init')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
 
-            <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }" v-if="map" >
-                <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span></div></li>
+            <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }" v-if="map">
+                <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span>
+                </div>
+            </li>
 
             <li v-on:click="emitEvent('show')" v-bind:class="{ active: pos }" v-if="map">
-                <div style="padding-left: 25px;"><i class="fas fa-route"></i><span style="margin: 15px;">Show routes</span></div></li>
+                <div style="padding-left: 25px;"><i class="fas fa-route"></i><span
+                        style="margin: 15px;">Show routes</span></div>
+            </li>
 
             <li v-on:click="emitEvent('yard')" v-bind:class="{ active: pos }" v-if="map">
-                <div style="padding-left: 25px;"><i class="fas fa-warehouse"></i><span style="margin: 15px;">Yard</span></div></li>
+                <div style="padding-left: 25px;"><i class="fas fa-warehouse"></i><span style="margin: 15px;">Yard</span>
+                </div>
+            </li>
 
             <li v-on:click="emitEvent('get')" v-bind:class="{ active: pos }" v-if="map">
-                <div style="padding-left: 25px;"><i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span></div></li>
+                <div style="padding-left: 25px;"><i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span>
+                </div>
+            </li>
 
             <li v-on:click="changeRoute('vehicles')" v-bind:class="{ active: vehicles }">
                 <i class="fas fa-truck"></i><span style="margin: 15px;">Vehicles</span></li>
@@ -363,6 +371,7 @@
             appConfig.$on('show', searchQuery => {
                 //this.showRoutes();
                 this.getSpecificPositionDataFromStart();
+                //this.getSpecificPositionDataInPeriod();
             });
             appConfig.$on('get', searchQuery => {
                 this.getPos();
@@ -474,8 +483,8 @@
                         this.loading = false;
                     });
             },
-            getSpecificPositionDataFromStart() {
-                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataFromStart?vehicleOid=37069135407&startDate=2019-01-01', {
+            getSpecificPositionDataInPeriod() {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataInPeriod?vehicleOid=37065506704&startDate=2019-10-31&endDate=2019-11-01', {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -488,18 +497,63 @@
 
                         let path = [];
                         this.items.forEach((item) => {
-                            let obj = {}
+                            let obj = {};
                             obj.lat = item.lat;
                             obj.lng = item.lng;
-                            obj.date = item.dateTimeOfRecording.split('T')[0];
+                            //obj.date = item.dateTimeOfRecording.split('T')[0];
+                            obj.date = item.dateTimeOfRecording;
                             path.push(obj)
                         });
 
                         path.sort(function (a, b) {
-                            return new Date(a.date) - new Date(b.date);
+                            return new Date(b.date) - new Date(a.date);
                         });
 
+                        console.log(path)
+
                         this.flightPath = new google.maps.Polyline({
+                            path: path.slice(0, 1000),
+                            geodesic: true,
+                            strokeColor: '#01579B',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 6
+                        });
+                        this.flightPath.setMap(map);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getSpecificPositionDataFromStart() {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataFromStart?vehicleOid=37064062815&startDate=2019-01-01', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        this.items = result.data;
+
+                        let path = [];
+                        this.items.forEach((item) => {
+                            let obj = {};
+                            obj.lat = item.lat;
+                            obj.lng = item.lng;
+                            obj.date = item.dateTimeOfRecording;
+                            path.push(obj)
+                        });
+
+                        path.sort(function (a, b) {
+                            return new Date(b.date) - new Date(a.date);
+                        });
+
+                        console.log(path)
+
+                        this.flightPath = new google.maps.Polyline({
+                            //path: path.slice(0, 10000),
                             path: path,
                             geodesic: true,
                             strokeColor: '#01579B',
