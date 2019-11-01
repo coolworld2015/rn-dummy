@@ -155,7 +155,7 @@
 
             <li v-on:click="changeRoute('map'); emitEvent('init')" v-bind:class="{ active: map }">
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
-
+<!--
             <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }" v-if="map">
                 <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set all data</span>
                 </div>
@@ -174,7 +174,7 @@
             <li v-on:click="emitEvent('get')" v-bind:class="{ active: pos }" v-if="map">
                 <div style="padding-left: 25px;"><i class="fas fa-map-marker-alt"></i><span style="margin: 15px;">Get position</span>
                 </div>
-            </li>
+            </li>-->
 
             <li v-on:click="changeRoute('vehicles')" v-bind:class="{ active: vehicles }">
                 <i class="fas fa-truck"></i><span style="margin: 15px;">Vehicles</span></li>
@@ -383,6 +383,10 @@
                 this.loading = false;
             });
 
+            appConfig.$on('error', searchQuery => {
+                alert('Someting went wrong - server error');
+            });
+
             Notification.requestPermission().then(function (result) {
                 /*let notification = new Notification('VU-Demo', {
                     icon: '../img/message.jpg',
@@ -434,7 +438,7 @@
                 this.loading = true;
                 this.getToken();
                 setTimeout(this.getPos, 100);
-                setTimeout(this.getAllCars, 3000);
+                setTimeout(this.getAllCars, 2000);
                 setTimeout(this.getVehiclesCurrentPositions, 3000);
 
                 appConfig.map = true;
@@ -450,6 +454,10 @@
                     },
                     success: function (data, textStatus) {
                         window.access_token = 'Bearer ' + data.access_token;
+                    },
+                    error: function () {
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     }
                 });
             },
@@ -490,13 +498,13 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        appConfig.items = this.filteredItems;
+                        appConfig.items = result.data;
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             getVehiclesCurrentPositions() {
@@ -513,10 +521,9 @@
                         let now = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
 
                         this.items = result.data.filter((item) => item.dateTimeOfRecording.split('T')[0] === now);
-                        console.log(this.items)
 
                         let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
-                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng, item.vehicleOid]);
+                        + item.dateTimeOfRecording.split('T').join(' ') + '<br><br>', item.lat, item.lng, item.vehicleOid]);
 
                         var infowindow = new google.maps.InfoWindow();
                         var that = this;
@@ -528,8 +535,10 @@
 
                             var locs = [].concat(locations);
                             google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                                let reg = appConfig.items.filter((item) => (item.vehicleOid === locs[i][3]))
+                                let plate = '<h2>PlateNo: ' + reg[0].vehicleId + '&nbsp&nbsp&nbsp</h2><hr>';
                                 return function () {
-                                    infowindow.setContent(locs[i][0]);
+                                    infowindow.setContent(plate + locs[i][0]);
                                     infowindow.open(map, marker);
                                     that.getSpecificPositionDataFromStart(locs[i][3])
                                 }
@@ -538,8 +547,8 @@
                         appConfig.$emit('loaded', {});
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             getCar() {
@@ -559,8 +568,8 @@
                         appConfig.$emit('itemsCount', this.items.length);
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             getSpecificPositionDataInPeriod() {
@@ -601,8 +610,8 @@
                         this.flightPath.setMap(map);
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             getSpecificPositionDataFromStart(id) {
@@ -643,8 +652,8 @@
                         this.flightPath.setMap(map);
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             getAllPositions() {
@@ -680,8 +689,8 @@
                         }
                     })
                     .catch(error => {
-                        this.error = true;
-                        this.loading = false;
+                        appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});
                     });
             },
             yard() {
