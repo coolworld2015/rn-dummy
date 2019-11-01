@@ -364,13 +364,10 @@
                 this.init();
             });
             appConfig.$on('set', searchQuery => {
-                //this.setPoints();
                 this.getAllPositions();
             });
             appConfig.$on('show', searchQuery => {
-                //this.showRoutes();
                 this.getSpecificPositionDataFromStart();
-                //this.getSpecificPositionDataInPeriod();
             });
             appConfig.$on('get', searchQuery => {
                 this.getPos();
@@ -438,8 +435,8 @@
                 this.loading = true;
                 this.getToken();
                 setTimeout(this.getPos, 100);
-                setTimeout(this.getAllCars, 2000);
-                setTimeout(this.getVehiclesCurrentPositions, 3000);
+                setTimeout(this.getAllCars, 3000);
+                setTimeout(this.getVehiclesCurrentPositions, 4000);
 
                 appConfig.map = true;
             },
@@ -589,7 +586,6 @@
                             let obj = {};
                             obj.lat = item.lat;
                             obj.lng = item.lng;
-                            //obj.date = item.dateTimeOfRecording.split('T')[0];
                             obj.date = item.dateTimeOfRecording;
                             path.push(obj)
                         });
@@ -597,8 +593,6 @@
                         path.sort(function (a, b) {
                             return new Date(b.date) - new Date(a.date);
                         });
-
-                        console.log(path)
 
                         this.flightPath = new google.maps.Polyline({
                             path: path.slice(0, 1000),
@@ -639,10 +633,8 @@
                             return new Date(b.date) - new Date(a.date);
                         });
 
-                        console.log(path)
                         this.flightPath.setMap(null);
                         this.flightPath = new google.maps.Polyline({
-                            //path: path.slice(0, 10000),
                             path: path,
                             geodesic: true,
                             strokeColor: '#01579B',
@@ -697,7 +689,6 @@
                 map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 18,
                     center: new google.maps.LatLng(49.1234807, 8.5564619),
-                    //mapTypeId: google.maps.MapTypeId.ROADMAP
                     mapTypeId: google.maps.MapTypeId.SATELLITE
                 });
 
@@ -714,7 +705,6 @@
                     position: new google.maps.LatLng(49.1232625, 8.5555243),
                     draggable: true,
                     title: 'Truck 2',
-                    //animation: google.maps.Animation.BOUNCE,
                     icon: this.truck_f,
                     map: map
                 });
@@ -723,7 +713,6 @@
                     position: new google.maps.LatLng(49.124633, 8.5552671),
                     draggable: true,
                     title: 'Truck 3',
-                    //animation: google.maps.Animation.BOUNCE,
                     icon: this.truck_long,
                     map: map
                 });
