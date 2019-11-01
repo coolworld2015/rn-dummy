@@ -157,7 +157,7 @@
                 <i class="fa fa-fw fa-map"></i><span style="margin: 15px;">Map</span></li>
 
             <li v-on:click="emitEvent('set')" v-bind:class="{ active: pos }" v-if="map">
-                <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set data</span>
+                <div style="padding-left: 25px;"><i class="fa fa-fw fa-database"></i><span style="margin: 15px;">Set all data</span>
                 </div>
             </li>
 
@@ -315,11 +315,16 @@
     });
 
     Vue.component('googleMap', {
-        template: '<div class="middle" id="map"></div>',
+        template: `<div>
+            <img v-if="loading" style="position: absolute; margin-left: -160px; top: 300px; z-index: 100" src="./img/loading.gif" alt="">
+            <div class="middle" id="map"></div>
+        </div>`,
         data() {
             return {
                 map: '',
                 items: [],
+                loading: true,
+                error: false,
                 symbolOne: {
                     path: 'M -2,0 0,-2 2,0 0,2 z',
                     strokeColor: 'gold',
@@ -353,13 +358,7 @@
             }
         },
         created() {
-            setTimeout(this.init, 500);
-            /*setTimeout(this.getAllCars, 1000);
-            setTimeout(this.getSpecificPositionDataFromStart, 2000);
-            setTimeout(this.getCar, 2000);
-            */
-
-            this.getToken();
+            this.init();
 
             appConfig.$on('init', searchQuery => {
                 this.init();
@@ -378,6 +377,10 @@
             });
             appConfig.$on('yard', searchQuery => {
                 this.yard();
+            });
+
+            appConfig.$on('loaded', searchQuery => {
+                this.loading = false;
             });
 
             Notification.requestPermission().then(function (result) {
@@ -427,6 +430,15 @@
             };
         },
         methods: {
+            init() {
+                this.loading = true;
+                this.getToken();
+                setTimeout(this.getPos, 100);
+                setTimeout(this.getAllCars, 3000);
+                setTimeout(this.getVehiclesCurrentPositions, 3000);
+
+                appConfig.map = true;
+            },
             getToken() {
                 $.ajax({
                     url: 'https://213.144.11.162:10380/authentication',
@@ -441,6 +453,33 @@
                     }
                 });
             },
+            getPos() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(this.showPosition);
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            },
+            showPosition(position) {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 11,
+                    center: new google.maps.LatLng(lat, lng),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    //mapTypeId: google.maps.MapTypeId.SATELLITE
+                });
+
+                map.setCenter(new google.maps.LatLng(lat, lng));
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(lat, lng),
+                    draggable: true,
+                    //animation: google.maps.Animation.BOUNCE,
+                    icon: this.image,
+                    map: map
+                });
+            },
             getAllCars() {
                 this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData', {
                     headers: {
@@ -451,11 +490,52 @@
                 })
                     .then((response) => response.json())
                     .then(result => {
-                        //this.items = JSON.parse(result.data);
-                        //this.filteredItems = JSON.parse(result.data);
                         appConfig.items = this.filteredItems;
                         this.loading = false;
                         appConfig.$emit('itemsCount', this.items.length);
+                    })
+                    .catch(error => {
+                        this.error = true;
+                        this.loading = false;
+                    });
+            },
+            getVehiclesCurrentPositions() {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': window.access_token
+                    }
+                })
+                    .then((response) => response.json())
+                    .then(result => {
+                        let date = new Date;
+                        let now = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+
+                        this.items = result.data.filter((item) => item.dateTimeOfRecording.split('T')[0] === now);
+                        console.log(this.items)
+
+                        let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
+                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng, item.vehicleOid]);
+
+                        var infowindow = new google.maps.InfoWindow();
+                        var that = this;
+                        for (var i = 0; i < this.items.length; i++) {
+                            marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                                map: map
+                            });
+
+                            var locs = [].concat(locations);
+                            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                                return function () {
+                                    infowindow.setContent(locs[i][0]);
+                                    infowindow.open(map, marker);
+                                    that.getSpecificPositionDataFromStart(locs[i][3])
+                                }
+                            })(marker, i));
+                        }
+                        appConfig.$emit('loaded', {});
                     })
                     .catch(error => {
                         this.error = true;
@@ -525,8 +605,8 @@
                         this.loading = false;
                     });
             },
-            getSpecificPositionDataFromStart() {
-                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataFromStart?vehicleOid=37064062815&startDate=2019-01-01', {
+            getSpecificPositionDataFromStart(id) {
+                this.$http.get('https://213.144.11.162:10380/api/Positions/GetSpecificPositionDataFromStart?vehicleOid=' + id + '&startDate=2019-01-01', {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -551,7 +631,7 @@
                         });
 
                         console.log(path)
-
+                        this.flightPath.setMap(null);
                         this.flightPath = new google.maps.Polyline({
                             //path: path.slice(0, 10000),
                             path: path,
@@ -579,9 +659,10 @@
                     .then(result => {
                         this.items = result.data.splice(0, 5000);
                         let locations = this.items.map((item) => ['<h3>VehicleOid: ' + item.vehicleOid + '&nbsp&nbsp&nbsp</h3><hr>'
-                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng]);
+                        + item.dateTimeOfRecording.split('T').join(' '), item.lat, item.lng, item.vehicleOid]);
 
                         var infowindow = new google.maps.InfoWindow();
+                        var that = this;
                         for (var i = 0; i < this.items.length; i++) {
                             marker = new google.maps.Marker({
                                 position: new google.maps.LatLng(locations[i][1], locations[i][2]),
@@ -593,6 +674,7 @@
                                 return function () {
                                     infowindow.setContent(locs[i][0]);
                                     infowindow.open(map, marker);
+                                    that.getSpecificPositionDataFromStart(locs[i][3])
                                 }
                             })(marker, i));
                         }
@@ -601,31 +683,6 @@
                         this.error = true;
                         this.loading = false;
                     });
-            },
-            init() {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 13,
-                    center: new google.maps.LatLng(49.124966, 8.552490),
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                    //mapTypeId: google.maps.MapTypeId.SATELLITE
-                });
-
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.124966, 8.552490),
-                    draggable: true,
-                    animation: google.maps.Animation.BOUNCE,
-                    icon: this.symbolOne,
-                    map: map
-                });
-
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(49.124888, 8.552490),
-                    draggable: true,
-                    icon: this.image,
-                    map: map
-                });
-
-                appConfig.map = true;
             },
             yard() {
                 map = new google.maps.Map(document.getElementById('map'), {
@@ -699,31 +756,6 @@
             showRoutes() {
                 this.flightPath.setMap(map);
             },
-            getPos() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(this.showPosition);
-                } else {
-                    alert("Geolocation is not supported by this browser.");
-                }
-            },
-
-            showPosition(position) {
-                if (marker) {
-                    marker.setMap(null);
-                }
-
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-
-                map.setCenter(new google.maps.LatLng(lat, lng));
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat, lng),
-                    draggable: true,
-                    //animation: google.maps.Animation.BOUNCE,
-                    icon: this.image,
-                    map: map
-                });
-            }
         },
     });
 
