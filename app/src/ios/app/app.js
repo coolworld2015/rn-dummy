@@ -7,12 +7,15 @@ import AppContainer from './appContainer';
 
 console.disableYellowBox = true;
 
+/*GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
+global.FormData = global.originalFormData ? global.originalFormData : global.FormData;*/
+
 class App extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isLoggedIn: false,
+            isLoggedIn: true,
         };
 
         window.appConfig = {

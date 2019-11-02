@@ -12,10 +12,14 @@ import {
     TextInput,
     Dimensions,
     Image,
+    Alert
 } from 'react-native';
 
 import ListView from 'deprecated-react-native-listview';
 import MenuDrawer from 'react-native-side-drawer';
+
+/*GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
+global.FormData = global.originalFormData ? global.originalFormData : global.FormData;*/
 
 import UserDetails from './userDetails';
 
@@ -38,6 +42,7 @@ class Users extends Component {
             open: false
         };
 
+        //this.getToken();
         this.getItems();
     }
 
@@ -64,8 +69,114 @@ class Users extends Component {
         }
     }
 
+    getToken() {
+        console.log('xxxxxxxxxxxxx')
+        var request = new XMLHttpRequest();
+        var FD = new URLSearchParams();
+        FD.append('grant_type', 'password');
+        FD.append('username', 'manyvehicles@abona-erp.com');
+        FD.append('password', '1234qwerQWER,.-');
+        console.log(FD.toString())
+        request.open('POST', 'https://213.144.11.162:10380/authentication', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;');
+
+        request.onload = function () {
+            if (this.status >= 200 && this.status < 400) {
+                appConfig.access_token = JSON.parse(this.responseText).access_token;
+                console.dir(JSON.parse(this.responseText).access_token);
+                Alert.alert(JSON.parse(this.responseText).access_token);
+                // If successful
+            } else {
+                // If fail
+                //console.log(this.response);
+            }
+        };
+        request.onerror = function (error) {
+            console.log(error);
+        };
+        request.send(FD.toString());
+
+        /*        $.ajax({
+                    url: 'https://213.144.11.162:10380/authentication',
+                    type: "POST",
+                    data: 'grant_type=password&username=manyvehicles@abona-erp.com&password=1234qwerQWER,.-',
+                    headers: {
+                        'Accept': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    success: function (data, textStatus) {
+                        window.access_token = 'Bearer ' + data.access_token;
+                    },
+                    error: function () {
+                        /!*appConfig.$emit('loaded', {});
+                        appConfig.$emit('error', {});*!/
+                    }
+                });*/
+
+        /*        var details = {
+                    'username': 'manyvehicles@abona-erp.com',
+                    'password': '1234qwerQWER,.-',
+                    'grant_type': 'password'
+                };
+
+                var FD  = new URLSearchParams();
+                FD.append('grant_type','password');
+                FD.append('username','manyvehicles@abona-erp.com');
+                FD.append('password','1234qwerQWER,.-');
+
+                fetch('https://213.144.11.162:10380/authentication', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    body: FD
+
+                })
+                    .then(response => response.json())
+                    .then((responseData) => {
+                        Alert.alert(responseData)
+                        console.log(responseData)
+                    })
+                    .catch(() => {
+                        Alert.alert('errr')
+                        this.setState({
+                            serverError: true,
+                        });
+                    })*/
+    }
+
+    getItems0() {
+        fetch('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer AQAAANCMnd8BFdERjHoAwE_Cl-sBAAAAUI8WpvRhK0OYDreqtcd9ywAAAAACAAAAAAAQZgAAAAEAACAAAAC5a-zO5yMD022PaUWJ1fFWQ6OXdAOHJxj3c261VqcfzQAAAAAOgAAAAAIAACAAAACkBC5fMiH9I1uGT_8Ua1xq2BjuonftT7q6NsdBQxPXqSABAABqiVMqXS6qTZz9P7QAyiZCedUak-EsblsAdmYkLmg-jGtG4uw6Xh_MYzhX-w0EABpgPvd3st1GzuBBeEmKqhDdbAghhMKqjTiF9n-qSnzYAKf5kdjXDcx6s05fi7ytUNWKj-j8SJBZyE-SNCs8-5EAReyskZXJ8Aa9dbPKeK3aqt2LDS-TgwfKLB0YyjUU8DvAeJ6HPvUYNvoXduIEjEGpOQtqVPdFLSLnkqxw06KFaB42YvXLJ7ELA4v31r7c5-y-b5RaU2EqxTalywI-i56UJQ6ZMJL1mmE_VqY5EjwcoIoQdzIRkjGcG_tc-OMwUUOE9NRt5dDCk2VgZZOC6MqaN_bEA9x2y7vMvSaY9MVCvN1-nL5J8rwjo7PisbTNXJ1AAAAADe5DcHisok4EVrKP-9EPr14ama1jnCqioUV3h_Gmpffco6AwLLYiJSsHAgwuDxt8Wa_IX-Pyf2QNP0-j8JHFrw'
+            }
+        })
+            .then((responseData) => {
+                Alert.alert('cool')
+                /*this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(responseData.data.slice(0, 25)),
+                    resultsCount: responseData.data.length,
+                    responseData: responseData.data,
+                    filteredItems: responseData.data,
+                });*/
+            })
+            .catch((err) => {
+                Alert.alert('xxxx')
+                this.setState({
+                    serverError: true,
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    showProgress: false,
+                });
+            });
+    }
+
     getItems() {
-        //fetch(appConfig.url + 'api/v1/employees', {
         fetch('http://dummy.restapiexample.com/api/v1/employees', {
             method: 'get',
             headers: {
