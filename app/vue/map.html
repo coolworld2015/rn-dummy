@@ -434,9 +434,9 @@
             init() {
                 this.loading = true;
                 this.getToken();
-                setTimeout(this.getPos, 100);
-                setTimeout(this.getAllCars, 3000);
-                setTimeout(this.getVehiclesCurrentPositions, 4000);
+                setTimeout(this.getPos, 1000);
+                setTimeout(this.getAllCars, 2000);
+                setTimeout(this.getVehiclesCurrentPositions, 3000);
 
                 appConfig.map = true;
             },
@@ -486,6 +486,12 @@
                 });
             },
             getAllCars() {
+                if (!window.access_token) {
+                    console.log('getAllCars')
+                    setTimeout(this.getAllCars, 1000);
+                    return false;
+                }
+
                 this.$http.get('https://213.144.11.162:10380/api/Vehicles/GetAllVehicleData', {
                     headers: {
                         'Accept': 'application/json',
@@ -505,6 +511,12 @@
                     });
             },
             getVehiclesCurrentPositions() {
+                if (!window.access_token) {
+                    console.log('getVehiclesCurrentPositions')
+                    setTimeout(this.getVehiclesCurrentPositions, 1000);
+                    return false;
+                }
+
                 this.$http.get('https://213.144.11.162:10380/api/Positions/GetAllPositions', {
                     headers: {
                         'Accept': 'application/json',
