@@ -384,14 +384,14 @@
                 alert('Someting went wrong - server error');
             });
 
-            Notification.requestPermission().then(function (result) {
-                /*let notification = new Notification('VU-Demo', {
+/*            Notification.requestPermission().then(function (result) {
+                /!*let notification = new Notification('VU-Demo', {
                     icon: '../img/message.jpg',
                     body: 'Hey there! Chat is started!',
-                });*/
-            });
+                });*!/
+            });*/
 
-            if (window.ws === undefined) {
+/*            if (window.ws === undefined) {
                 window.ws = new WebSocket('wss://jwt-chat.herokuapp.com');
             }
 
@@ -428,13 +428,13 @@
                             break;
                     }
                 }
-            };
+            };*/
         },
         methods: {
             init() {
                 this.loading = true;
                 this.getToken();
-                setTimeout(this.getPos, 1000);
+                setTimeout(this.setMap, 100);
                 setTimeout(this.getAllCars, 2000);
                 setTimeout(this.getVehiclesCurrentPositions, 5000);
 
@@ -456,6 +456,26 @@
                         appConfig.$emit('loaded', {});
                         appConfig.$emit('error', {});
                     }
+                });
+            },
+            setMap() {
+                let lat = '49.1249637';
+                let lng = '8.5525';
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 11,
+                    center: new google.maps.LatLng(lat, lng),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    //mapTypeId: google.maps.MapTypeId.SATELLITE
+                });
+
+                map.setCenter(new google.maps.LatLng(lat, lng));
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(lat, lng),
+                    draggable: true,
+                    animation: google.maps.Animation.BOUNCE,
+                    icon: this.symbolOne,
+                    map: map
                 });
             },
             getPos() {
