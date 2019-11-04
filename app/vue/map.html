@@ -464,18 +464,12 @@
                 FD.append('grant_type', 'password');
                 FD.append('username', 'manyvehicles@abona-erp.com');
                 FD.append('password', '1234qwerQWER,.-');
-                console.log(FD.toString())
                 request.open('POST', 'https://213.144.11.162:10380/authentication', true);
                 request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;');
-
                 request.onload = function () {
                     if (this.status >= 200 && this.status < 400) {
                         window.access_token = 'Bearer ' + JSON.parse(this.responseText).access_token;
-                        console.dir(JSON.parse(this.responseText).access_token);
-                        // If successful
                     } else {
-                        // If fail
-                        //console.log(this.response);
                     }
                 };
                 request.onerror = function (error) {
