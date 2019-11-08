@@ -10,7 +10,21 @@ import UserAdd from '../users/userAdd';
 
 import Chat from '../chat/chat';
 
+import Driver from '../yard/driver';
+
 import Map from '../map/map';
+
+const DriverTab = createStackNavigator({
+        Driver,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
 
 const ChatTab = createStackNavigator({
         Chat,
@@ -58,6 +72,7 @@ class Quit extends React.Component {
 }
 
 const TabNavigator = createBottomTabNavigator({
+        Driver: DriverTab,
         Demo: UsersTab,
         Map: MapTab,
         Chat: ChatTab,
@@ -69,6 +84,16 @@ const TabNavigator = createBottomTabNavigator({
                 const {routeName} = navigation.state;
                 let iconName;
 
+                if (routeName === 'Driver') {
+                    iconName = <Image
+                        source={require('../../../img/yard.png')}
+                        style={{
+                            height: 20,
+                            width: 20,
+                            margin: 0,
+                        }}
+                    />;
+                }
                 if (routeName === 'Chat') {
                     iconName = <Image
                         source={require('../../../img/users.png')}
