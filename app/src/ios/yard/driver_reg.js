@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
     TextInput,
     Dimensions,
-    KeyboardAvoidingView
+    Alert
 } from 'react-native';
 
 class Login extends Component {
@@ -20,23 +20,108 @@ class Login extends Component {
 
         this.state = {
             showProgress: false,
-            username: '2',
-            password: '2',
-            bugANDROID: '',
+            badCredentials: '',
+            plateNo: '',
             width: Dimensions.get('window').width
         }
     }
 
-	componentDidMount() {
-		appConfig.socket.name = this.state.username;
-		this.setState({
-			width: Dimensions.get('window').width
+    componentDidMount() {
+    }
+
+    getToken() {
+        if (this.state.plateNo === '') {
+            this.invalidValue = true;
+        }
+
+        if (this.invalidValue) {
+            return;
+        }
+
+        this.setState({
+            showProgress: true,
+            badCredentials: false,
         });
-	}
+
+        var plateNo = this.state.plateNo;
+
+        fetch('https://jwt-yard.herokuapp.com/api/auth', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                console.log(responseData);
+                appConfig.access_token = responseData.token;
+
+                fetch('https://jwt-yard.herokuapp.com/api/vehicles/get', {
+                    method: 'get',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': appConfig.access_token
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((items) => {
+                        var arr = items.filter((el) => el.plateNo.toLowerCase() === plateNo.toLowerCase());
+                        if (arr[0]) {
+                            if (arr[0].plateNo.toLowerCase() === this.state.plateNo.toLowerCase()) {
+                                appConfig.driver = arr[0];
+                                appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
+
+                                this.props.navigation.navigate('Driver');
+                            } else {
+                                this.setState({
+                                    badCredentials: true,
+                                    showProgress: false
+                                });
+                            }
+                            /*this.setState({
+                                badCredentials: true,
+                                showProgress: false
+                            });*/
+                        }
+                        /*this.setState({
+                            badCredentials: true,
+                            showProgress: false
+                        });*/
+                    })
+                    .catch(error => {
+                        this.setState({
+                            badCredentials: true,
+                            showProgress: false
+                        });
+                    });
+            })
+            .catch(error => {
+                this.setState({
+                    badCredentials: true,
+                    showProgress: false
+                });
+            });
+    }
 
     onLogin() {
-        if (this.state.username === undefined || this.state.username === '' ||
-            this.state.password === undefined || this.state.password === '') {
+        if (this.state.plateNo === '') {
+            this.invalidValue = true;
+        }
+
+        if (this.invalidValue) {
+            return;
+        }
+
+        appConfig.getAccessToken();
+
+        if (!appConfig.access_token) {
+            this.getToken();
+            return;
+        }
+
+        if (this.state.username === undefined || this.state.username === '') {
             this.setState({
                 badCredentials: true
             });
@@ -45,13 +130,13 @@ class Login extends Component {
 
         this.setState({
             showProgress: true,
-			badCredentials: false,
+            badCredentials: false,
             bugANDROID: ' '
         });
 
         var url = appConfig.url;
 
-        fetch(appConfig.url + 'api/login', {
+        fetch('https://jwt-yard.herokuapp.com/api/login', {
             method: 'post',
             body: JSON.stringify({
                 name: this.state.username,
@@ -65,10 +150,10 @@ class Login extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-				console.log(responseData);
+                console.log(responseData);
                 if (responseData.token) {
                     appConfig.access_token = responseData.token;
-					appConfig.socket.name = this.state.username;
+                    appConfig.socket.name = this.state.username;
                     this.setState({
                         badCredentials: false
                     });
@@ -81,7 +166,7 @@ class Login extends Component {
                 }
             })
             .catch((error) => {
-				console.log(responseData);
+                console.log(responseData);
                 this.setState({
                     badCredentials: true,
                     showProgress: false
@@ -94,29 +179,28 @@ class Login extends Component {
 
         if (this.state.badCredentials) {
             errorCtrl = <Text style={styles.error}>
-                That username and password combination did not work
+                Can't register this PlateNo - try another one
             </Text>;
         }
 
         return (
             <ScrollView style={{backgroundColor: 'whitesmoke'}} keyboardShouldPersistTaps='always'>
-                <KeyboardAvoidingView behavior="padding" enabled>
                 <View style={styles.container}>
 
                     <View style={styles.headerContainer}>
                         <Text style={styles.heading}>
-                            RN-ABONA
+                            RN-Yard
                         </Text>
                     </View>
 
-					<Image style={styles.logo}
-                           source={require('../../../img/abona.png')}
+                    <Image style={styles.logo}
+                           source={require('../../../img/yard.png')}
                     />
 
                     <TextInput
                         underlineColorAndroid='rgba(0,0,0,0)'
                         onChangeText={(text) => this.setState({
-                            username: text,
+                            plateNo: text,
                             badCredentials: false
                         })}
                         style={{
@@ -132,34 +216,11 @@ class Login extends Component {
                             backgroundColor: 'white'
                         }}
                         value={this.state.username}
-                        placeholder='Login'>
-                    </TextInput>
-
-                    <TextInput
-                        underlineColorAndroid='rgba(0,0,0,0)'
-                        onChangeText={(text) => this.setState({
-                            password: text,
-                            badCredentials: false
-                        })}
-                        style={{
-                            height: 50,
-                            width: this.state.width * .90,
-                            marginTop: 10,
-                            padding: 4,
-                            fontSize: 18,
-                            borderWidth: 1,
-                            borderColor: 'lightgray',
-                            borderRadius: 5,
-                            color: 'black',
-                            backgroundColor: 'white'
-                        }}
-                        value={this.state.password}
-                        placeholder='Password'
-                        secureTextEntry={true}>
+                        placeholder='PlateNo'>
                     </TextInput>
 
                     <TouchableHighlight
-                        onPress={() => this.onLogin()}
+                        onPress={() => this.getToken()}
                         style={styles.button}>
                         <Text style={styles.buttonText}>
                             Log in
@@ -171,13 +232,11 @@ class Login extends Component {
                     <ActivityIndicator
                         animating={this.state.showProgress}
                         size="large"
-						color="darkblue"
+                        color="darkblue"
                         style={styles.loader}
                     />
 
-                    <Text>{this.state.bugANDROID}</Text>
                 </View>
-                </KeyboardAvoidingView>
             </ScrollView>
         )
     }
@@ -200,13 +259,13 @@ const styles = StyleSheet.create({
         height: 150,
         paddingTop: 140,
         borderRadius: 20,
-		marginBottom: 10
+        marginBottom: 10
     },
     headerContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-		marginBottom: 10,
-		marginTop: -10
+        marginBottom: 10,
+        marginTop: 20
     },
     heading: {
         fontSize: 30,
@@ -221,7 +280,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'darkblue',
         borderColor: '#48BBEC',
         alignSelf: 'stretch',
-        marginTop: 20,
+        marginTop: 30,
         margin: 5,
         justifyContent: 'center',
         alignItems: 'center',
@@ -233,7 +292,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     loader: {
-        marginTop: 40
+        marginTop: 30
     },
     error: {
         color: 'red',

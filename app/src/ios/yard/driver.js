@@ -23,13 +23,19 @@ class Chat extends Component {
             messages: [],
             filteredItems: [],
             messageText: '',
-            showProgress: true,
+            showProgress: false,
+            plateNo: appConfig.driver.plateNo,
+            status: appConfig.driver.status,
+            standing: appConfig.driver.standing,
             width: Dimensions.get('window').width
         };
 
         if (!appConfig.socket.name) {
             appConfig.socket.name = 'Ed';
         }
+
+        var status = '';
+        var standing = '';
 
         ws = new WebSocket('wss://jwt-yard.herokuapp.com');
 
@@ -55,7 +61,19 @@ class Chat extends Component {
                 message: messageObject.split('###')[0]
             });
 
+            if (messageObject.split('###')[0] !== 'still alive') {
+                if (messageObject.split('###')[0] === this.state.plateNo) {
+                    status = messageObject.split('###')[1];
+                    standing = messageObject.split('###')[2];
+                    let time = messageObject.split('###')[3].split('.')[0];
+                    time = Date.parse(time);
+                    //this.renderStatus(time);
+                }
+            }
+
             this.setState({
+                status,
+                standing,
                 showProgress: false
             });
 
@@ -97,7 +115,7 @@ class Chat extends Component {
             Alert.alert('You have received a new notification!', notification);
         });
 
-        this.getItems();
+        //this.getItems();
     }
 
     componentWillUnmount() {
@@ -140,7 +158,7 @@ class Chat extends Component {
                 this.setState({
                     serverError: true
                 });
-                window.appConfig.onLogOut();
+                //window.appConfig.onLogOut();
             })
             .finally(() => {
                 this.setState({
@@ -262,7 +280,6 @@ class Chat extends Component {
 
         return (
             <View style={styles.container}>
-                <KeyboardAvoidingView behavior="padding" enabled>
                     <View style={{
                         flex: 1,
                         backgroundColor: 'whitesmoke',
@@ -282,28 +299,17 @@ class Chat extends Component {
                         height: 170
                     }}>
                         <View>
-                            <TextInput
-                                underlineColorAndroid='rgba(0,0,0,0)'
-                                onChangeText={(text) => this.setState({
-                                    messageText: text,
-                                    invalidValue: false
-                                })}
-                                value={this.state.messageText}
-                                style={{
-                                    height: 50,
-                                    width: this.state.width * .95,
-                                    marginTop: -20,
-                                    padding: 4,
-                                    fontSize: 18,
-                                    borderWidth: 1,
-                                    borderColor: 'lightgray',
-                                    borderRadius: 5,
-                                    color: 'black',
-                                    backgroundColor: 'white'
-                                }}
-                                onSubmitEditing={() => this.goSend()}
-                                placeholder='Message'>
-                            </TextInput>
+                            <Text style={styles.error}>
+                                {this.state.plateNo}
+                            </Text>
+
+                            <Text style={styles.error}>
+                                {this.state.status}
+                            </Text>
+
+                            <Text style={styles.error}>
+                                {this.state.standing}
+                            </Text>
 
                         </View>
 
@@ -328,7 +334,6 @@ class Chat extends Component {
                             </TouchableHighlight>
                         </View>
                     </View>
-                </KeyboardAvoidingView>
             </View>
         );
     }
