@@ -11,7 +11,6 @@ import UserAdd from '../users/userAdd';
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
-import DriverReg from '../yard/driverReg';
 
 import Map from '../map/map';
 

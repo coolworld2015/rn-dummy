@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 console.disableYellowBox = true;
 
 import Login from './login';
+import DriverReg from '../yard/driverReg';
 import AppContainer from './appContainer';
 
 class App extends Component {
@@ -12,13 +13,14 @@ class App extends Component {
         super(props);
 
         this.state = {
-            isLoggedIn: false,
+            isLoggedIn: true,
         };
 
         window.appConfig = {
             access_token: '',
             url: 'http://jwt-chat.herokuapp.com/',
             onLogOut: this.onLogOut.bind(this),
+            onLogin: this.onLogin.bind(this),
             socket: {},
             phones: {
                 refresh: true,
@@ -35,6 +37,11 @@ class App extends Component {
                 items: [],
                 item: {},
             },
+            driver: {
+                plateNo: 'AA1234AA',
+                status: 'arrived',
+                standing: 'n/a',
+            }
         };
     }
 
@@ -53,7 +60,7 @@ class App extends Component {
             );
         } else {
             return (
-                <Login onLogin={this.onLogin.bind(this)}/>
+                <DriverReg/>
             );
         }
     }

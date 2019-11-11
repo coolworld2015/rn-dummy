@@ -4,18 +4,14 @@ import {
     Text,
     View,
     TouchableHighlight,
-    TextInput,
     Dimensions,
-    ActivityIndicator,
     ScrollView,
     Alert,
-    KeyboardAvoidingView
 } from 'react-native';
 
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import ListItem from './listItem';
 
-class Chat extends Component {
+class Driver extends Component {
     constructor(props) {
         super(props);
         var date = new Date().toJSON().slice(0, 10);
@@ -186,7 +182,6 @@ class Chat extends Component {
                             margin: 10,
                             paddingTop: 10,
                             height: 50,
-                            //backgroundColor: '#48BBEC',
                             backgroundColor: 'darkblue',
                             width: this.state.width * .85,
                             color: 'white',
@@ -230,10 +225,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'whitesmoke',
         borderColor: '#48BBEC',
-        //borderRadius: 5,
-        //borderWidth: 3
         marginTop: 50
-
     },
     welcome: {
         fontSize: 20,
@@ -273,4 +265,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Chat;
+export default Driver;

@@ -14,7 +14,21 @@ import UserAdd from '../users/userAdd';
 
 import Chat from '../chat/chat';
 
+import Driver from '../yard/driver';
+
 import Map from '../map/map';
+
+const DriverTab = createStackNavigator({
+        Driver,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
 
 const UsersTab = createStackNavigator({
         Users,
@@ -90,6 +104,7 @@ const tabBarOptions = {
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
+        Driver: DriverTab,
         Map: MapTab,
         Demo: UsersTab,
         Chat: ChatTab,
