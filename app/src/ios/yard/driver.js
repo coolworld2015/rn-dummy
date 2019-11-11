@@ -288,7 +288,30 @@ class Chat extends Component {
                     borderColor: '#48BBEC',
                     height: 170
                 }}>
-                    <View>
+                    <View style={{
+                        margin: 10,
+                        marginTop: 10,
+                        backgroundColor: 'darkblue',
+                        borderColor: 'darkblue',
+                        //borderColor: '#48BBEC',
+                        //backgroundColor: '#48BBEC',
+                        borderRadius: 15,
+                        borderWidth: 1
+                    }}>
+                        <Text style={{
+                            fontSize: 20,
+                            textAlign: 'center',
+                            margin: 10,
+                            marginTop: 0,
+                            //backgroundColor: '#48BBEC',
+                            backgroundColor: 'darkblue',
+                            width: this.state.width * .85,
+                            color: 'white',
+                            fontWeight: 'bold'
+                        }}>
+                            {this.state.plateNo}
+                        </Text>
+{/*                    <View>
                         <Text style={styles.error}>
                             {this.state.plateNo}
                         </Text>
@@ -299,7 +322,7 @@ class Chat extends Component {
 
                         <Text style={styles.error}>
                             {this.state.standing}
-                        </Text>
+                        </Text>*/}
 
                     </View>
 

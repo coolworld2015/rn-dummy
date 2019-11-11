@@ -88,7 +88,7 @@ class DriverReg extends Component {
                                 })
                                     .then((response) => response.json())
                                     .then((responseData) => {
-                                        this.props.navigation.navigate('Driver');
+                                        window.appConfig.onLogin();
                                     })
                                     .catch((error) => {
                                         this.setState({

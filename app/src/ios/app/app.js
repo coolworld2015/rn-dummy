@@ -23,6 +23,7 @@ class App extends Component {
             access_token: '',
             url: 'http://jwt-chat.herokuapp.com/',
             onLogOut: this.onLogOut.bind(this),
+            onLogin: this.onLogin.bind(this),
             socket: {},
             phones: {
                 items: [],
