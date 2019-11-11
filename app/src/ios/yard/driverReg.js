@@ -88,7 +88,9 @@ class DriverReg extends Component {
                                 })
                                     .then((response) => response.json())
                                     .then((responseData) => {
+
                                         window.appConfig.onLogin();
+
                                     })
                                     .catch((error) => {
                                         this.setState({
@@ -117,31 +119,6 @@ class DriverReg extends Component {
                     showProgress: false
                 });
             });
-    }
-
-    addAudit() {
-        fetch('https://jwt-yard.herokuapp.com/api/audit/add', {
-            method: 'post',
-            body: JSON.stringify({
-                name: this.state.plateNo,
-                description: 'Driver',
-                authorization: appConfig.access_token
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-
-            })
-            .catch((error) => {
-                this.setState({
-                    badCredentials: true,
-                    showProgress: false
-                });
-            })
     }
 
     render() {
