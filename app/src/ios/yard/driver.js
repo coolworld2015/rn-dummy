@@ -42,15 +42,15 @@ class Driver extends Component {
         };
 
         ws.onmessage = (e) => {
-            let d = new Date;
+            var date = new Date().toJSON().slice(0, 10);
+            var time = new Date().toTimeString().slice(0, 8);
             let messageObject = e.data;
-            let time;
 
             if (messageObject !== 'still alive') {
                 if (messageObject.split('###')[0] === this.state.plateNo) {
                     status = messageObject.split('###')[1];
                     standing = messageObject.split('###')[2];
-                    time = messageObject.split('###')[3].split('.')[0];
+                    time = date + ' ' + time;
                     this.renderStatus(status, standing);
                 }
                 this.setState({
@@ -60,7 +60,6 @@ class Driver extends Component {
                     showProgress: false
                 });
             }
-
         };
     }
 
