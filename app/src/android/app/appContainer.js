@@ -107,7 +107,6 @@ const TabNavigator = createMaterialTopTabNavigator({
         Driver: DriverTab,
         Map: MapTab,
         Demo: UsersTab,
-        Chat: ChatTab,
         Quit: Logout,
     },
     {

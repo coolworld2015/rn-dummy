@@ -170,6 +170,7 @@ class DriverReg extends Component {
                             backgroundColor: 'white'
                         }}
                         value={this.state.username}
+                        placeholderTextColor='gray'
                         placeholder='PlateNo'>
                     </TextInput>
 
@@ -219,11 +220,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
-        marginTop: 20
+        marginTop: 0
     },
     heading: {
         fontSize: 30,
-        marginTop: 10,
+        marginTop: 0,
         color: 'navy',
         fontWeight: 'bold',
         textAlign: 'center'

@@ -97,73 +97,75 @@ class Driver extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <Text style={{
-                    fontSize: 40,
-                    textAlign: 'center',
-                    margin: 10,
-                    paddingTop: 25,
-                    height: 100,
-                    backgroundColor: 'darkblue',
-                    width: this.state.width * .85,
-                    color: 'white',
-                    fontWeight: 'bold',
-                    borderRadius: 10
-                }}>
-                    {this.state.plateNo}
-                </Text>
+            <ScrollView style={{backgroundColor: 'whitesmoke'}} keyboardShouldPersistTaps='always'>
+                <View style={styles.container}>
+                    <Text style={{
+                        fontSize: 40,
+                        textAlign: 'center',
+                        margin: 10,
+                        paddingTop: 3,
+                        height: 60,
+                        backgroundColor: 'darkblue',
+                        width: this.state.width * .85,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        borderRadius: 10
+                    }}>
+                        {this.state.plateNo}
+                    </Text>
 
-                <Text style={{
-                    fontSize: 50,
-                    textAlign: 'center',
-                    margin: 10,
-                    paddingTop: 40,
-                    height: 200,
-                    backgroundColor: 'red',
-                    width: this.state.width * .85,
-                    color: 'white',
-                    fontWeight: 'bold',
-                    borderRadius: 10
-                }}>
-                    {this.state.command}
-                </Text>
+                    <Text style={{
+                        fontSize: 50,
+                        textAlign: 'center',
+                        margin: 10,
+                        paddingTop: 40,
+                        height: 200,
+                        backgroundColor: 'red',
+                        width: this.state.width * .85,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        borderRadius: 10
+                    }}>
+                        {this.state.command}
+                    </Text>
 
-                <Text style={{
-                    fontSize: 25,
-                    textAlign: 'center',
-                    margin: 10,
-                    paddingTop: 10,
-                    height: 50,
-                    backgroundColor: 'darkblue',
-                    width: this.state.width * .85,
-                    color: 'white',
-                    fontWeight: 'bold',
-                    borderRadius: 5,
-                }}>
-                    {this.state.time}
-                </Text>
+                    <Text style={{
+                        fontSize: 25,
+                        textAlign: 'center',
+                        margin: 10,
+                        paddingTop: 10,
+                        height: 50,
+                        backgroundColor: 'darkblue',
+                        width: this.state.width * .85,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        borderRadius: 5,
+                    }}>
+                        {this.state.time}
+                    </Text>
 
-                <View>
-                    <TouchableHighlight
-                        onPress={() => this.goSend()}
-                        style={{
-                            height: 50,
-                            width: this.state.width * .95,
-                            backgroundColor: 'darkblue',
-                            borderColor: '#48BBEC',
-                            alignSelf: 'stretch',
-                            marginTop: 20,
-                            margin: 5,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 5
-                        }}>
-                        <Text style={styles.buttonText}>
-                            Quit
-                        </Text>
-                    </TouchableHighlight>
+                    <View>
+                        <TouchableHighlight
+                            onPress={() => this.goSend()}
+                            style={{
+                                height: 50,
+                                width: this.state.width * .95,
+                                backgroundColor: 'darkblue',
+                                borderColor: '#48BBEC',
+                                alignSelf: 'stretch',
+                                marginTop: 20,
+                                margin: 5,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 5
+                            }}>
+                            <Text style={styles.buttonText}>
+                                Quit
+                            </Text>
+                        </TouchableHighlight>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 }
