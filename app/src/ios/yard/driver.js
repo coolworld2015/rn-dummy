@@ -18,12 +18,14 @@ import ListItem from './listItem';
 class Chat extends Component {
     constructor(props) {
         super(props);
+        var date = new Date().toJSON().slice(0, 10);
+        var time = new Date().toTimeString().slice(0, 8);
 
         this.state = {
             messages: [],
             filteredItems: [],
-            time: '',
-            command: 'Wait for destination',
+            time: date + ' ' + time,
+            command: 'Go to yard right now',
             showProgress: false,
             plateNo: appConfig.driver.plateNo,
             status: appConfig.driver.status,
@@ -31,9 +33,7 @@ class Chat extends Component {
             width: Dimensions.get('window').width
         };
 
-        if (!appConfig.socket.name) {
-            appConfig.socket.name = 'Ed';
-        }
+        this.renderStatus(appConfig.driver.status, appConfig.driver.standing);
 
         var status = '';
         var standing = '';
@@ -91,7 +91,7 @@ class Chat extends Component {
             Alert.alert('You have received a new notification!', notification);
         });
 
-        //this.getItems();
+        this.renderStatus(appConfig.driver.status, appConfig.driver.standing);
     }
 
     componentWillUnmount() {
@@ -109,19 +109,19 @@ class Chat extends Component {
         var command;
         switch (status) {
             case 'created':
-                command = 'Go to yard';
+                command = 'Go to yard right now';
                 break;
             case 'arrived':
                 command = 'Wait for destination';
                 break;
             case 'booked':
-                command = 'Go to ' + standing;
+                command = 'Go to ' + standing + ' right now';
                 break;
             case 'docked':
                 command = 'Wait for undocking';
                 break;
             case 'undocked':
-                command = 'Go from yard';
+                command = 'Go from yard, now';
                 break;
             case 'departed':
                 command = 'You are left yard';
@@ -147,14 +147,14 @@ class Chat extends Component {
                         backgroundColor: 'whitesmoke',
                         borderColor: '#48BBEC',
                         height: 170,
-                        marginTop: 170,
+                        marginTop: 200,
                     }}>
 
                         <Text style={{
-                            fontSize: 30,
+                            fontSize: 40,
                             textAlign: 'center',
                             margin: 10,
-                            paddingTop: 35,
+                            paddingTop: 25,
                             height: 100,
                             backgroundColor: 'darkblue',
                             width: this.state.width * .85,
@@ -166,11 +166,11 @@ class Chat extends Component {
                         </Text>
 
                         <Text style={{
-                            fontSize: 30,
+                            fontSize: 50,
                             textAlign: 'center',
                             margin: 10,
-                            paddingTop: 35,
-                            height: 150,
+                            paddingTop: 40,
+                            height: 200,
                             backgroundColor: 'red',
                             width: this.state.width * .85,
                             color: 'white',
@@ -180,35 +180,20 @@ class Chat extends Component {
                             {this.state.command}
                         </Text>
 
-
                         <Text style={{
                             fontSize: 25,
                             textAlign: 'center',
                             margin: 10,
-                            marginTop: 30,
+                            paddingTop: 10,
                             height: 50,
                             //backgroundColor: '#48BBEC',
                             backgroundColor: 'darkblue',
                             width: this.state.width * .85,
                             color: 'white',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            borderRadius: 5
                         }}>
                             {this.state.time}
-                        </Text>
-
-                        <Text style={{
-                            fontSize: 25,
-                            textAlign: 'center',
-                            margin: 10,
-                            marginTop: 30,
-                            height: 50,
-                            //backgroundColor: '#48BBEC',
-                            backgroundColor: 'darkblue',
-                            width: this.state.width * .85,
-                            color: 'white',
-                            fontWeight: 'bold'
-                        }}>
-                            {this.state.standing}
                         </Text>
 
                         <View>
