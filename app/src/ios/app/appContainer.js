@@ -75,7 +75,6 @@ const TabNavigator = createBottomTabNavigator({
         Driver: DriverTab,
         Demo: UsersTab,
         Map: MapTab,
-        Chat: ChatTab,
         Quit: Quit
     },
     {

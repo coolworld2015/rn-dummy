@@ -143,15 +143,15 @@ class Driver extends Component {
                         backgroundColor: 'whitesmoke',
                         borderColor: '#48BBEC',
                         height: 170,
-                        marginTop: 200,
+                        marginTop: 140,
                     }}>
 
                         <Text style={{
                             fontSize: 40,
                             textAlign: 'center',
                             margin: 10,
-                            paddingTop: 25,
-                            height: 100,
+                            paddingTop: 4,
+                            height: 60,
                             backgroundColor: 'darkblue',
                             width: this.state.width * .85,
                             color: 'white',
@@ -165,7 +165,7 @@ class Driver extends Component {
                             fontSize: 50,
                             textAlign: 'center',
                             margin: 10,
-                            paddingTop: 40,
+                            paddingTop: 30,
                             height: 200,
                             backgroundColor: 'red',
                             width: this.state.width * .85,
@@ -180,13 +180,13 @@ class Driver extends Component {
                             fontSize: 25,
                             textAlign: 'center',
                             margin: 10,
-                            paddingTop: 10,
+                            paddingTop: 9,
                             height: 50,
                             backgroundColor: 'darkblue',
                             width: this.state.width * .85,
                             color: 'white',
                             fontWeight: 'bold',
-                            borderRadius: 5
+                            borderRadius: 5,
                         }}>
                             {this.state.time}
                         </Text>
