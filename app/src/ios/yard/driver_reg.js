@@ -73,6 +73,7 @@ class Login extends Component {
                                 appConfig.driver = arr[0];
                                 appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
 
+                                this.addAudit();
                                 this.props.navigation.navigate('Driver');
                             } else {
                                 this.setState({
@@ -105,43 +106,13 @@ class Login extends Component {
             });
     }
 
-    onLogin() {
-        if (this.state.plateNo === '') {
-            this.invalidValue = true;
-        }
-
-        if (this.invalidValue) {
-            return;
-        }
-
-        appConfig.getAccessToken();
-
-        if (!appConfig.access_token) {
-            this.getToken();
-            return;
-        }
-
-        if (this.state.username === undefined || this.state.username === '') {
-            this.setState({
-                badCredentials: true
-            });
-            return;
-        }
-
-        this.setState({
-            showProgress: true,
-            badCredentials: false,
-            bugANDROID: ' '
-        });
-
-        var url = appConfig.url;
-
-        fetch('https://jwt-yard.herokuapp.com/api/login', {
+    addAudit() {
+        fetch('https://jwt-yard.herokuapp.com/api/audit/add', {
             method: 'post',
             body: JSON.stringify({
-                name: this.state.username,
-                pass: this.state.password,
-                description: 'Android'
+                name: this.state.plateNo,
+                description: 'Driver',
+                authorization: appConfig.access_token
             }),
             headers: {
                 'Accept': 'application/json',
@@ -150,23 +121,9 @@ class Login extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                console.log(responseData);
-                if (responseData.token) {
-                    appConfig.access_token = responseData.token;
-                    appConfig.socket.name = this.state.username;
-                    this.setState({
-                        badCredentials: false
-                    });
-                    this.props.onLogin();
-                } else {
-                    this.setState({
-                        badCredentials: true,
-                        showProgress: false
-                    });
-                }
+
             })
             .catch((error) => {
-                console.log(responseData);
                 this.setState({
                     badCredentials: true,
                     showProgress: false

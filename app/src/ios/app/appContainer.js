@@ -90,8 +90,8 @@ const TabNavigator = createBottomTabNavigator({
                     iconName = <Image
                         source={require('../../../img/yard.png')}
                         style={{
-                            height: 20,
-                            width: 20,
+                            height: 25,
+                            width: 25,
                             margin: 0,
                         }}
                     />;
