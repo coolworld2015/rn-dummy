@@ -49,13 +49,14 @@ class Driver extends Component {
                     standing = messageObject.split('###')[2];
                     time = date + ' ' + time;
                     this.renderStatus(status, standing);
+
+                    this.setState({
+                        status,
+                        standing,
+                        time,
+                        showProgress: false
+                    });
                 }
-                this.setState({
-                    status,
-                    standing,
-                    time,
-                    showProgress: false
-                });
             }
         };
     }
