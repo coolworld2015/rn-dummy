@@ -119,10 +119,14 @@ class Chat extends Component {
     }
 
     componentWillUnmount() {
-        PushNotificationIOS.removeEventListener('register', (token) => {});
-        PushNotificationIOS.removeEventListener('notification', (token) => {});
-        PushNotificationIOS.removeEventListener('localNotification', (token) => {});
-        PushNotificationIOS.removeEventListener('registrationError', (token) => {});
+        PushNotificationIOS.removeEventListener('register', (token) => {
+        });
+        PushNotificationIOS.removeEventListener('notification', (token) => {
+        });
+        PushNotificationIOS.removeEventListener('localNotification', (token) => {
+        });
+        PushNotificationIOS.removeEventListener('registrationError', (token) => {
+        });
     }
 
     getItems() {
@@ -179,21 +183,7 @@ class Chat extends Component {
     }
 
     goSend() {
-        if (this.state.messageText == '') {
-            this.setState({
-                invalidValue: true
-            });
-            return;
-        }
-
-        let messageObject;
-        messageObject = this.state.messageText + '###' + appConfig.socket.name;
-
-        ws.send(messageObject); //TODO
-        this.setState({
-            messageText: '',
-            showProgress: true
-        });
+        window.appConfig.onLogOut();
     }
 
     refreshData(event) {
@@ -280,60 +270,60 @@ class Chat extends Component {
 
         return (
             <View style={styles.container}>
-                    <View style={{
-                        flex: 1,
-                        backgroundColor: 'whitesmoke',
-                        borderColor: '#48BBEC',
-                    }}>
-                        <ScrollView onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
-                            {loader}
-                            {this.showMessages()}
-                        </ScrollView>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: 'whitesmoke',
+                    borderColor: '#48BBEC',
+                }}>
+                    <ScrollView onScroll={this.refreshData.bind(this)} scrollEventThrottle={16}>
+                        {loader}
+                        {this.showMessages()}
+                    </ScrollView>
+                </View>
+
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: 'whitesmoke',
+                    borderColor: '#48BBEC',
+                    height: 170
+                }}>
+                    <View>
+                        <Text style={styles.error}>
+                            {this.state.plateNo}
+                        </Text>
+
+                        <Text style={styles.error}>
+                            {this.state.status}
+                        </Text>
+
+                        <Text style={styles.error}>
+                            {this.state.standing}
+                        </Text>
+
                     </View>
 
-                    <View style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: 'whitesmoke',
-                        borderColor: '#48BBEC',
-                        height: 170
-                    }}>
-                        <View>
-                            <Text style={styles.error}>
-                                {this.state.plateNo}
+                    <View>
+                        <TouchableHighlight
+                            onPress={() => this.goSend()}
+                            style={{
+                                height: 50,
+                                width: this.state.width * .95,
+                                backgroundColor: 'darkblue',
+                                borderColor: '#48BBEC',
+                                alignSelf: 'stretch',
+                                marginTop: 20,
+                                margin: 5,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 5
+                            }}>
+                            <Text style={styles.buttonText}>
+                                Quit
                             </Text>
-
-                            <Text style={styles.error}>
-                                {this.state.status}
-                            </Text>
-
-                            <Text style={styles.error}>
-                                {this.state.standing}
-                            </Text>
-
-                        </View>
-
-                        <View>
-                            <TouchableHighlight
-                                onPress={() => this.goSend()}
-                                style={{
-                                    height: 50,
-                                    width: this.state.width * .95,
-                                    backgroundColor: 'darkblue',
-                                    borderColor: '#48BBEC',
-                                    alignSelf: 'stretch',
-                                    marginTop: 20,
-                                    margin: 5,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    borderRadius: 5
-                                }}>
-                                <Text style={styles.buttonText}>
-                                    Send
-                                </Text>
-                            </TouchableHighlight>
-                        </View>
+                        </TouchableHighlight>
                     </View>
+                </View>
             </View>
         );
     }

@@ -14,13 +14,14 @@ import {
     Alert
 } from 'react-native';
 
-class Login extends Component {
+class DriverReg extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             showProgress: false,
-            badCredentials: '',
+            invalidValue: false,
+            badCredentials: false,
             plateNo: '',
             width: Dimensions.get('window').width
         }
@@ -31,15 +32,15 @@ class Login extends Component {
 
     getToken() {
         if (this.state.plateNo === '') {
-            this.invalidValue = true;
-        }
-
-        if (this.invalidValue) {
+            this.setState({
+                invalidValue: true,
+            });
             return;
         }
 
         this.setState({
             showProgress: true,
+            invalidValue: false,
             badCredentials: false,
         });
 
@@ -73,23 +74,35 @@ class Login extends Component {
                                 appConfig.driver = arr[0];
                                 appConfig.driver.reg = new Date(+new Date() - (new Date()).getTimezoneOffset() * 60000).toISOString();
 
-                                this.addAudit();
-                                this.props.navigation.navigate('Driver');
-                            } else {
-                                this.setState({
-                                    badCredentials: true,
-                                    showProgress: false
-                                });
+                                fetch('https://jwt-yard.herokuapp.com/api/audit/add', {
+                                    method: 'post',
+                                    body: JSON.stringify({
+                                        name: this.state.plateNo,
+                                        description: 'Driver - iOS',
+                                        authorization: appConfig.access_token
+                                    }),
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then((response) => response.json())
+                                    .then((responseData) => {
+                                        this.props.navigation.navigate('Driver');
+                                    })
+                                    .catch((error) => {
+                                        this.setState({
+                                            badCredentials: true,
+                                            showProgress: false
+                                        });
+                                    })
                             }
-                            /*this.setState({
+                        } else {
+                            this.setState({
                                 badCredentials: true,
                                 showProgress: false
-                            });*/
+                            });
                         }
-                        /*this.setState({
-                            badCredentials: true,
-                            showProgress: false
-                        });*/
                     })
                     .catch(error => {
                         this.setState({
@@ -140,6 +153,12 @@ class Login extends Component {
             </Text>;
         }
 
+        if (this.state.invalidValue) {
+            errorCtrl = <Text style={styles.error}>
+                Value required - please provide
+            </Text>;
+        }
+
         return (
             <ScrollView style={{backgroundColor: 'whitesmoke'}} keyboardShouldPersistTaps='always'>
                 <View style={styles.container}>
@@ -158,6 +177,7 @@ class Login extends Component {
                         underlineColorAndroid='rgba(0,0,0,0)'
                         onChangeText={(text) => this.setState({
                             plateNo: text,
+                            invalidValue: false,
                             badCredentials: false
                         })}
                         style={{
@@ -254,8 +274,9 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 10,
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize: 20,
     }
 });
 
-export default Login;
+export default DriverReg;

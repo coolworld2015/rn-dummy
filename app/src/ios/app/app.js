@@ -3,6 +3,7 @@
 import React, {Component} from 'react';
 
 import Login from './login';
+import DriverReg from '../yard/driverReg';
 import AppContainer from './appContainer';
 
 console.disableYellowBox = true;
@@ -35,6 +36,11 @@ class App extends Component {
                 items: [],
                 item: {},
             },
+            driver: {
+                plateNo: 'AA1234AA',
+                status: 'arrived',
+                standing: 'n/a',
+            }
         };
     }
 
@@ -53,7 +59,7 @@ class App extends Component {
             );
         } else {
             return (
-                <Login onLogin={this.onLogin.bind(this)}/>
+                <DriverReg/>
             );
         }
     }

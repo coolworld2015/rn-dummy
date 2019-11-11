@@ -11,12 +11,11 @@ import UserAdd from '../users/userAdd';
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
-import Driver_reg from '../yard/driver_reg';
+import DriverReg from '../yard/driverReg';
 
 import Map from '../map/map';
 
 const DriverTab = createStackNavigator({
-        Driver_reg,
         Driver,
     }, {
         headerMode: 'none',
