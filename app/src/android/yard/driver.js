@@ -83,7 +83,7 @@ class Driver extends Component {
                 command = 'Go from yard, now';
                 break;
             case 'departed':
-                command = 'You are left yard';
+                command = 'You left the yard';
                 break;
         }
         this.setState({
