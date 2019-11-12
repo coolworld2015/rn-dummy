@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
     TextInput,
     Dimensions,
-    Alert
+    KeyboardAvoidingView
 } from 'react-native';
 
 class DriverReg extends Component {
@@ -138,59 +138,61 @@ class DriverReg extends Component {
 
         return (
             <ScrollView style={{backgroundColor: 'whitesmoke'}} keyboardShouldPersistTaps='always'>
-                <View style={styles.container}>
+                <KeyboardAvoidingView behavior="padding" enabled>
+                    <View style={styles.container}>
 
-                    <View style={styles.headerContainer}>
-                        <Text style={styles.heading}>
-                            RN-Yard
-                        </Text>
+                        <View style={styles.headerContainer}>
+                            <Text style={styles.heading}>
+                                RN-Yard
+                            </Text>
+                        </View>
+
+                        <Image style={styles.logo}
+                               source={require('../../../img/yard.png')}
+                        />
+
+                        <TextInput
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            onChangeText={(text) => this.setState({
+                                plateNo: text,
+                                invalidValue: false,
+                                badCredentials: false
+                            })}
+                            style={{
+                                height: 50,
+                                width: this.state.width * .90,
+                                marginTop: 10,
+                                padding: 4,
+                                fontSize: 18,
+                                borderWidth: 1,
+                                borderColor: 'lightgray',
+                                borderRadius: 5,
+                                color: 'black',
+                                backgroundColor: 'white'
+                            }}
+                            value={this.state.username}
+                            placeholder='PlateNo'>
+                        </TextInput>
+
+                        <TouchableHighlight
+                            onPress={() => this.getToken()}
+                            style={styles.button}>
+                            <Text style={styles.buttonText}>
+                                Log in
+                            </Text>
+                        </TouchableHighlight>
+
+                        {errorCtrl}
+
+                        <ActivityIndicator
+                            animating={this.state.showProgress}
+                            size="large"
+                            color="darkblue"
+                            style={styles.loader}
+                        />
+
                     </View>
-
-                    <Image style={styles.logo}
-                           source={require('../../../img/yard.png')}
-                    />
-
-                    <TextInput
-                        underlineColorAndroid='rgba(0,0,0,0)'
-                        onChangeText={(text) => this.setState({
-                            plateNo: text,
-                            invalidValue: false,
-                            badCredentials: false
-                        })}
-                        style={{
-                            height: 50,
-                            width: this.state.width * .90,
-                            marginTop: 10,
-                            padding: 4,
-                            fontSize: 18,
-                            borderWidth: 1,
-                            borderColor: 'lightgray',
-                            borderRadius: 5,
-                            color: 'black',
-                            backgroundColor: 'white'
-                        }}
-                        value={this.state.username}
-                        placeholder='PlateNo'>
-                    </TextInput>
-
-                    <TouchableHighlight
-                        onPress={() => this.getToken()}
-                        style={styles.button}>
-                        <Text style={styles.buttonText}>
-                            Log in
-                        </Text>
-                    </TouchableHighlight>
-
-                    {errorCtrl}
-
-                    <ActivityIndicator
-                        animating={this.state.showProgress}
-                        size="large"
-                        color="darkblue"
-                        style={styles.loader}
-                    />
-
-                </View>
+                </KeyboardAvoidingView>
             </ScrollView>
         )
     }
