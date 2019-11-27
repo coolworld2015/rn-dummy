@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     img: {
-        height: 200,
+        height: 250,
         width: 300,
         borderRadius: 10,
         margin: 10
