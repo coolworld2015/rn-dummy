@@ -12,6 +12,9 @@ import Dummys from '../dummys/dummys';
 import DummyDetails from '../dummys/dummyDetails';
 import DummyAdd from '../dummys/dummyAdd';
 
+import Guests from '../guests/guests';
+import GuestDetails from '../guests/guestDetails';
+
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
@@ -69,6 +72,18 @@ const DummysTab = createStackNavigator({
         }),
     },
 );
+const GuestsTab = createStackNavigator({
+        Guests,
+        GuestDetails,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
 
 const MapTab = createStackNavigator({
         Map
@@ -90,8 +105,8 @@ class Quit extends React.Component {
 }
 
 const TabNavigator = createBottomTabNavigator({
+        Guests: GuestsTab,
         Users: UsersTab,
-        //Driver: DriverTab,
         Demo: DummysTab,
         Map: MapTab,
         Quit: Quit
@@ -108,6 +123,16 @@ const TabNavigator = createBottomTabNavigator({
                         style={{
                             height: 25,
                             width: 25,
+                            margin: 0,
+                        }}
+                    />;
+                }
+                if (routeName === 'Guests') {
+                    iconName = <Image
+                        source={require('../../../img/checkpoint.png')}
+                        style={{
+                            height: 15,
+                            width: 20,
                             margin: 0,
                         }}
                     />;

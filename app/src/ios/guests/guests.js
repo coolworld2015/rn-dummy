@@ -18,7 +18,7 @@ import ListView from 'deprecated-react-native-listview';
 
 import MenuDrawer from "react-native-side-drawer";
 
-class Users extends Component {
+class Guests extends Component {
     constructor(props) {
         super(props);
 
@@ -63,7 +63,7 @@ class Users extends Component {
     }
 
     getItems() {
-        fetch(appConfig.url + 'api/users/get', {
+        fetch(appConfig.url + 'api/guests/all', {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -152,13 +152,31 @@ class Users extends Component {
     }
 
     renderRow(rowData) {
+        let pic;
+
+        if (rowData.photo !== 'blank') {
+            pic = <Image
+                source={{uri: rowData.photo}}
+                resizeMode='stretch'
+                style={styles.img}
+            />
+        } else {
+            pic = <Image
+                source={require('../../../img/no-img.png')}
+                resizeMode='stretch'
+                style={styles.img}
+            />
+        }
         return (
             <TouchableHighlight
                 onPress={() => this.showDetails(rowData)}
                 underlayColor='#ddd'>
-                <View style={styles.row}>
+
+                <View style={styles.imgsList}>
+                    {pic}
+
                     <Text style={styles.rowText}>
-                        {rowData.name}
+                        {rowData.name} - {rowData.date}
                     </Text>
                 </View>
             </TouchableHighlight>
@@ -341,7 +359,7 @@ class Users extends Component {
                                 <TouchableWithoutFeedback>
                                     <View>
                                         <Text style={styles.textLarge}>
-                                            Users
+                                            Guests
                                         </Text>
                                     </View>
                                 </TouchableWithoutFeedback>
@@ -409,6 +427,15 @@ class Users extends Component {
 }
 
 const styles = StyleSheet.create({
+    imgsList: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 0,
+        alignItems: 'center',
+        borderColor: '#D7D7D7',
+        borderBottomWidth: 1,
+        backgroundColor: '#fff',
+    },
     container: {
         flex: 1,
         flexDirection: 'column'
@@ -523,6 +550,12 @@ const styles = StyleSheet.create({
         color: 'white',
         backgroundColor: 'darkblue'
     },
+    img: {
+        height: 95,
+        width: 90,
+        borderRadius: 10,
+        margin: 10
+    },
 });
 
-export default Users;
+export default Guests;
