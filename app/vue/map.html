@@ -589,7 +589,7 @@
 
                             var locs = [].concat(locations);
                             google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                                let reg = appConfig.items.filter((item) => (item.vehicleOid === locs[i][3]))
+                                let reg = appConfig.items.filter((item) => (item.vehicleOid === locs[i][3]));
                                 let plate = '<h2>PlateNo: ' + reg[0].vehicleId + '&nbsp&nbsp&nbsp</h2><hr>';
                                 return function () {
                                     infowindow.setContent(plate + locs[i][0]);
@@ -1232,6 +1232,9 @@
                 closeNav();
                 appConfig.route = route;
                 this.init();
+                if (this.$router.currentRoute.path === '/' + route) {
+                    return false;
+                }
                 this.$router.push('/' + route);
                 return false;
             },

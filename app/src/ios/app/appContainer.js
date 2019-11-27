@@ -72,7 +72,8 @@ class Quit extends React.Component {
 }
 
 const TabNavigator = createBottomTabNavigator({
-        Driver: DriverTab,
+        Users: UsersTab,
+        //Driver: DriverTab,
         Demo: UsersTab,
         Map: MapTab,
         Quit: Quit
@@ -93,7 +94,7 @@ const TabNavigator = createBottomTabNavigator({
                         }}
                     />;
                 }
-                if (routeName === 'Chat') {
+                if (routeName === 'Users') {
                     iconName = <Image
                         source={require('../../../img/users.png')}
                         style={{
