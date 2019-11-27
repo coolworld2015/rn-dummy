@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'darkblue',
         borderWidth: 0,
         borderColor: 'whitesmoke',
-        marginTop: 50
+        marginTop: 35
     },
     textSmall: {
         fontSize: 16,
