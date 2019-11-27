@@ -3,14 +3,14 @@
 import React, {Component} from 'react';
 import {
     ActivityIndicator,
-    Alert, Text, View, StyleSheet
+    Text, View, StyleSheet
 } from 'react-native';
+
+console.disableYellowBox = true;
 
 import Login from './login';
 import DriverReg from '../yard/driverReg';
 import AppContainer from './appContainer';
-
-console.disableYellowBox = true;
 
 /*GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
 global.FormData = global.originalFormData ? global.originalFormData : global.FormData;*/
@@ -85,24 +85,6 @@ class App extends Component {
     }
 
     render() {
-        let errorCtrl, loader;
-
-        if (this.state.serverError) {
-            errorCtrl = <Text style={styles.error}>
-                Something went wrong.
-            </Text>;
-        }
-
-        if (this.state.showProgress) {
-            loader = <View style={styles.loader}>
-                <ActivityIndicator
-                    size="large"
-                    color="darkblue"
-                    animating={true}
-                />
-            </View>;
-        }
-
         if (!this.state.showProgress) {
             if (this.state.isLoggedIn) {
                 return (

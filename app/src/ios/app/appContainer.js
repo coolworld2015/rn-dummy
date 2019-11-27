@@ -72,6 +72,7 @@ const DummysTab = createStackNavigator({
         }),
     },
 );
+
 const GuestsTab = createStackNavigator({
         Guests,
         GuestDetails,

@@ -12,6 +12,9 @@ import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
+import Guests from '../guests/guests';
+import GuestDetails from '../guests/guestDetails';
+
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
@@ -34,6 +37,19 @@ const UsersTab = createStackNavigator({
         Users,
         UserDetails,
         UserAdd,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
+const GuestsTab = createStackNavigator({
+        Guests,
+        GuestDetails,
     }, {
         headerMode: 'none',
         transitionConfig: () => ({
@@ -104,7 +120,7 @@ const tabBarOptions = {
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
-        Driver: DriverTab,
+        Guests: GuestsTab,
         Map: MapTab,
         Demo: UsersTab,
         Quit: Logout,

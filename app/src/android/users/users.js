@@ -122,10 +122,6 @@ class Users extends Component {
         this.props.navigation.navigate('UserDetails');
     }
 
-    addItem() {
-        this.props.navigation.navigate('UserAdd');
-    }
-
     renderRow(rowData) {
         return (
             <TouchableHighlight
@@ -153,8 +149,6 @@ class Users extends Component {
         recordsCount = this.state.recordsCount;
         positionY = this.state.positionY;
         items = this.state.filteredItems.slice(0, recordsCount);
-console.log(event.nativeEvent.contentOffset.y)
-console.log('Y ', positionY - 10)
 
         if (event.nativeEvent.contentOffset.y >= positionY - 100) {
             this.setState({

@@ -1,6 +1,10 @@
 'use strict';
 
 import React, {Component} from 'react';
+import {
+    ActivityIndicator,
+    Text, View, StyleSheet
+} from 'react-native';
 
 console.disableYellowBox = true;
 
@@ -13,15 +17,17 @@ class App extends Component {
         super(props);
 
         this.state = {
+            showProgress: true,
             isLoggedIn: true,
         };
 
         window.appConfig = {
             access_token: '',
-            url: 'http://jwt-chat.herokuapp.com/',
+            url: 'http://jwt-yard.herokuapp.com/',
             onLogOut: this.onLogOut.bind(this),
             onLogin: this.onLogin.bind(this),
             socket: {},
+            item: {},
             phones: {
                 refresh: true,
                 items: [],
@@ -43,6 +49,30 @@ class App extends Component {
                 standing: 'n/a',
             }
         };
+
+        this.getToken();
+    }
+
+    getToken() {
+        fetch(appConfig.url + 'api/auth', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                appConfig.access_token = responseData.token;
+                this.setState({
+                    showProgress: false
+                });
+            })
+            .catch(() => {
+                this.setState({
+                    serverError: true
+                });
+            })
     }
 
     onLogin() {
@@ -54,17 +84,44 @@ class App extends Component {
     }
 
     render() {
-        if (this.state.isLoggedIn) {
-            return (
-                <AppContainer/>
-            );
+
+
+        if (!this.state.showProgress) {
+            if (this.state.isLoggedIn) {
+                return (
+                    <AppContainer/>
+                );
+
+            } else {
+                return (
+                    <DriverReg/>
+                );
+            }
         } else {
             return (
-                <DriverReg/>
+                <View style={styles.loader}>
+                    <ActivityIndicator
+                        size="large"
+                        color="darkblue"
+                        animating={true}
+                    />
+                </View>
             );
         }
     }
-
 }
+
+const styles = StyleSheet.create({
+    loader: {
+        marginTop: 200,
+        justifyContent: 'center',
+        height: 100
+    },
+    error: {
+        color: 'red',
+        paddingTop: 10,
+        textAlign: 'center'
+    },
+});
 
 export default App;
