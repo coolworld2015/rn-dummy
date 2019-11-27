@@ -103,48 +103,9 @@ class Guests extends Component {
         return 0;
     }
 
-    deleteItem(id) {
-        this.setState({
-            showProgress: true
-        });
-
-        fetch(appConfig.url + 'api/users/delete', {
-            method: 'post',
-            body: JSON.stringify({
-                id: id,
-                authorization: appConfig.access_token
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-                if (responseData.text) {
-                    appConfig.users.refresh = true;
-                    this.props.navigator.pop();
-                } else {
-                    this.setState({
-                        badCredentials: true
-                    });
-                }
-            })
-            .catch(() => {
-                this.setState({
-                    serverError: true
-                });
-            })
-            .finally(() => {
-                this.setState({
-                    showProgress: false
-                });
-            });
-    }
-
     showDetails(rowData) {
-        appConfig.users.item = rowData;
-        this.props.navigation.navigate('UserDetails');
+        appConfig.item = rowData;
+        this.props.navigation.navigate('GuestDetails');
     }
 
     addItem() {

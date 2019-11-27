@@ -30,6 +30,7 @@ class App extends Component {
             onLogOut: this.onLogOut.bind(this),
             onLogin: this.onLogin.bind(this),
             socket: {},
+            item: {},
             phones: {
                 items: [],
                 item: {},

@@ -10,7 +10,7 @@ import {
     ActivityIndicator,
     TextInput,
     TouchableWithoutFeedback,
-    Alert
+    Alert, Image
 } from 'react-native';
 
 class GuestDetails extends Component {
@@ -18,113 +18,14 @@ class GuestDetails extends Component {
         super(props);
 
         this.state = {
-            id: appConfig.users.item.id,
-            name: appConfig.users.item.name,
-            pass: appConfig.users.item.pass,
-            description: appConfig.users.item.description,
+            id: appConfig.item.id,
+            title: appConfig.item.name,
+            name: appConfig.item.name,
+            date: appConfig.item.date,
+            photo: appConfig.item.photo,
+            host: appConfig.item.host,
             showProgress: false
         }
-    }
-
-    updateItem() {
-        if (this.state.name === undefined || this.state.pass === '' ||
-            this.state.description === undefined || this.state.description === '') {
-            this.setState({
-                invalidValue: true
-            });
-            return;
-        }
-
-        this.setState({
-            showProgress: true
-        });
-
-        fetch(appConfig.url + 'api/users/update', {
-            method: 'post',
-            body: JSON.stringify({
-                id: this.state.id,
-                name: this.state.name,
-                pass: this.state.pass,
-                description: this.state.description,
-                authorization: appConfig.access_token
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-                if (responseData.pass) {
-                    appConfig.users.refresh = true;
-                    this.props.navigation.goBack();
-                } else {
-                    this.setState({
-                        badCredentials: true
-                    })
-                }
-            })
-            .catch((error) => {
-                this.setState({
-                    serverError: true
-                })
-            })
-            .finally(() => {
-                this.setState({
-                    showProgress: false
-                })
-            })
-    }
-
-    deleteItemDialog() {
-        Alert.alert(
-            'Delete record',
-            'Are you sure you want to delete ' + this.state.name + '?',
-            [
-                {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-                {
-                    text: 'OK', onPress: () => {
-                        this.deleteItem();
-                    }
-                }
-            ]
-        )
-    }
-
-    deleteItem() {
-        this.setState({
-            showProgress: true,
-            bugANDROID: ' '
-        });
-
-        fetch(appConfig.url + 'api/users/delete', {
-            method: 'post',
-            body: JSON.stringify({
-                id: this.state.id,
-                authorization: appConfig.access_token
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-                console.log(responseData)
-                appConfig.users.refresh = true;
-                this.props.navigation.goBack();
-            })
-            .catch((error) => {
-                console.log(error)
-                this.setState({
-                    serverError: true
-                })
-            })
-            .finally(() => {
-                this.setState({
-                    showProgress: false
-                })
-            })
     }
 
     goBack() {
@@ -132,18 +33,20 @@ class GuestDetails extends Component {
     }
 
     render() {
-        let errorCtrl, validCtrl;
+        let pic;
 
-        if (this.state.serverError) {
-            errorCtrl = <Text style={styles.error}>
-                Something went wrong.
-            </Text>
-        }
-
-        if (this.state.invalidValue) {
-            validCtrl = <Text style={styles.error}>
-                Value required - please provide.
-            </Text>
+        if (this.state.photo !== 'blank') {
+            pic = <Image
+                source={{uri: this.state.photo}}
+                resizeMode='stretch'
+                style={styles.img}
+            />
+        } else {
+            pic = <Image
+                source={require('../../../img/no-img.png')}
+                resizeMode='stretch'
+                style={styles.img1}
+            />
         }
 
         return (
@@ -164,18 +67,16 @@ class GuestDetails extends Component {
                         <TouchableWithoutFeedback underlayColor='#ddd'>
                             <View>
                                 <Text style={styles.textLarge}>
-                                    {this.state.name}
+                                    {this.state.title}
                                 </Text>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
                     <View>
                         <TouchableHighlight
-                            onPress={() => this.deleteItemDialog()}
                             underlayColor='darkblue'>
                             <View>
                                 <Text style={styles.textSmall}>
-                                    Delete
                                 </Text>
                             </View>
                         </TouchableHighlight>
@@ -184,6 +85,9 @@ class GuestDetails extends Component {
 
                 <ScrollView keyboardShouldPersistTaps='always'>
                     <View style={styles.inputBlock}>
+                        <View style={{alignItems: 'center'}}>
+                            {pic}
+                        </View>
 
                         <TextInput
                             onChangeText={(text) => this.setState({
@@ -201,32 +105,27 @@ class GuestDetails extends Component {
                                 invalidValue: false
                             })}
                             style={styles.loginInput}
-                            value={this.state.pass}
+                            value={this.state.date}
                             placeholder="Password">
                         </TextInput>
 
                         <TextInput
-                            multiline={true}
                             onChangeText={(text) => this.setState({
-                                description: text,
+                                pass: text,
                                 invalidValue: false
                             })}
-                            style={styles.formInputArea}
-                            value={this.state.description}
-                            placeholder="Description">
+                            style={styles.loginInput}
+                            value={this.state.host}
+                            placeholder="Password">
                         </TextInput>
 
-                        {validCtrl}
-
                         <TouchableHighlight
-                            onPress={() => this.updateItem()}
+                            onPress={() => this.goBack()}
                             style={styles.button}>
                             <Text style={styles.buttonText}>
-                                Submit
+                                Back
                             </Text>
                         </TouchableHighlight>
-
-                        {errorCtrl}
 
                         <ActivityIndicator
                             animating={this.state.showProgress}
@@ -267,7 +166,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         margin: 10,
         marginTop: 12,
-        marginRight: 20,
+        marginRight: 40,
         fontWeight: 'bold',
         color: 'white'
     },
@@ -328,7 +227,19 @@ const styles = StyleSheet.create({
         color: 'red',
         paddingTop: 20,
         textAlign: 'center'
-    }
+    },
+    img: {
+        height: 200,
+        width: 300,
+        borderRadius: 10,
+        margin: 10
+    },
+    img1: {
+        height: 200,
+        width: 200,
+        borderRadius: 10,
+        margin: 10
+    },
 });
 
 export default GuestDetails;
