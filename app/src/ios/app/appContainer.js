@@ -8,6 +8,10 @@ import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
+import Dummys from '../dummys/dummys';
+import DummyDetails from '../dummys/dummyDetails';
+import DummyAdd from '../dummys/dummyAdd';
+
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
@@ -52,6 +56,20 @@ const UsersTab = createStackNavigator({
     },
 );
 
+const DummysTab = createStackNavigator({
+        Dummys,
+        DummyDetails,
+        DummyAdd,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
 const MapTab = createStackNavigator({
         Map
     }, {
@@ -74,7 +92,7 @@ class Quit extends React.Component {
 const TabNavigator = createBottomTabNavigator({
         Users: UsersTab,
         //Driver: DriverTab,
-        Demo: UsersTab,
+        Demo: DummysTab,
         Map: MapTab,
         Quit: Quit
     },
