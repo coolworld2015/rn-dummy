@@ -139,6 +139,7 @@ class Users extends Component {
         if (event.nativeEvent.contentOffset.y <= -100) {
             this.setState({
                 showProgress: true,
+                serverError: false,
                 resultsCount: 0,
                 recordsCount: 25,
                 positionY: 0,
