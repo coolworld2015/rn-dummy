@@ -292,7 +292,7 @@ class Guests extends Component {
 
                     <View style={styles.header}>
                         <View>
-                            <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
+                            <TouchableWithoutFeedback>
                                 <View>
                                     <Image
                                         style={styles.menu}
@@ -312,7 +312,6 @@ class Guests extends Component {
                         </View>
                         <View>
                             <TouchableHighlight
-                                onPress={() => this.addItem()}
                                 underlayColor='darkblue'>
                                 <View>
                                     <Text style={styles.textSmall}>
