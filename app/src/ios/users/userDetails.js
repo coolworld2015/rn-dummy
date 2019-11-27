@@ -110,16 +110,12 @@ class UserDetails extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                if (responseData.text) {
-                    appConfig.users.refresh = true;
-                    this.props.navigation.goBack();
-                } else {
-                    this.setState({
-                        badCredentials: true
-                    })
-                }
+                console.log(responseData)
+                appConfig.users.refresh = true;
+                this.props.navigation.goBack();
             })
             .catch((error) => {
+                console.log(error)
                 this.setState({
                     serverError: true
                 })

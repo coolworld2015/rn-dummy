@@ -37,6 +37,7 @@ class App extends Component {
             users: {
                 items: [],
                 item: {},
+                refresh: false
             },
             audit: {
                 items: [],

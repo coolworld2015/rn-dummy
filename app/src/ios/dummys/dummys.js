@@ -12,7 +12,6 @@ import {
     TextInput,
     Dimensions,
     Image,
-    Alert
 } from 'react-native';
 
 import ListView from 'deprecated-react-native-listview';
