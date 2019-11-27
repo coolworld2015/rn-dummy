@@ -517,6 +517,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 10
     },
+    scroll: {
+        marginBottom: 120
+    },
 });
 
 export default Guests;
