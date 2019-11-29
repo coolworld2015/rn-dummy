@@ -447,6 +447,7 @@ const styles = StyleSheet.create({
         paddingLeft: 0,
         fontWeight: 'bold',
         color: 'white',
+        paddingTop: 3,
     },
     textInput: {
         height: 45,

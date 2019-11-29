@@ -204,7 +204,7 @@ class Map extends Component {
 </div>
 
 
-<div id="map" style="width: 100%; height: 600px;">
+<div id="map" style="width: 100%; height: 620px;">
 </div>
 
 <script type="text/javascript">

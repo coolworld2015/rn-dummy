@@ -15,11 +15,27 @@ import DummyAdd from '../dummys/dummyAdd';
 import Guests from '../guests/guests';
 import GuestDetails from '../guests/guestDetails';
 
+import Other from './other';
+
 import Chat from '../chat/chat';
 
 import Driver from '../yard/driver';
 
 import Map from '../map/map';
+
+const OtherTab = createStackNavigator({
+        Other,
+        Driver,
+        Map
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            }
+        })
+    }
+);
 
 const DriverTab = createStackNavigator({
         Driver,
@@ -109,8 +125,7 @@ const TabNavigator = createBottomTabNavigator({
         Guests: GuestsTab,
         Users: UsersTab,
         Demo: DummysTab,
-        Map: MapTab,
-        Quit: Quit
+        Other: OtherTab,
     },
     {
         defaultNavigationOptions: ({navigation}) => ({
@@ -124,6 +139,16 @@ const TabNavigator = createBottomTabNavigator({
                         style={{
                             height: 25,
                             width: 25,
+                            margin: 0,
+                        }}
+                    />;
+                }
+                if (routeName === 'Other') {
+                    iconName = <Image
+                        source={require('../../../img/other.png')}
+                        style={{
+                            height: 20,
+                            width: 20,
                             margin: 0,
                         }}
                     />;
