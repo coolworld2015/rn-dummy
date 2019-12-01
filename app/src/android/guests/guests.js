@@ -94,6 +94,10 @@ class Guests extends Component {
     }
 
     sort(a, b) {
+        return parseInt(b.id) - parseInt(a.id);
+    }
+
+    sortName(a, b) {
         let nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase();
         if (nameA < nameB) {
             return -1;
@@ -403,7 +407,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'darkblue',
         borderWidth: 0,
         borderColor: 'whitesmoke',
-        marginTop: 0,
+        marginTop: 1,
     },
     searchLarge: {
         height: 45,

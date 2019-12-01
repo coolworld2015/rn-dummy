@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'darkblue',
-        //borderTopWidth: 1,
+        marginTop: -4,
         borderColor: 'white',
     },
     searchLarge: {

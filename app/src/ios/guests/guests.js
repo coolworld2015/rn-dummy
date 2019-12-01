@@ -93,6 +93,10 @@ class Guests extends Component {
     }
 
     sort(a, b) {
+        return parseInt(b.id) - parseInt(a.id);
+    }
+
+    sortName(a, b) {
         let nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase();
         if (nameA < nameB) {
             return -1;
