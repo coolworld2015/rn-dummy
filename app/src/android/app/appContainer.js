@@ -12,6 +12,10 @@ import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
+import Dummys from '../dummys/dummys';
+import DummyDetails from '../dummys/dummyDetails';
+import DummyAdd from '../dummys/dummyAdd';
+
 import Guests from '../guests/guests';
 import GuestDetails from '../guests/guestDetails';
 
@@ -52,6 +56,20 @@ const UsersTab = createStackNavigator({
         Users,
         UserDetails,
         UserAdd,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
+const DummysTab = createStackNavigator({
+        Dummys,
+        DummyDetails,
+        DummyAdd,
     }, {
         headerMode: 'none',
         transitionConfig: () => ({
@@ -137,7 +155,7 @@ const tabBarOptions = {
 const TabNavigator = createMaterialTopTabNavigator({
         Guests: GuestsTab,
         Users: UsersTab,
-        Demo: UsersTab,
+        Demo: DummysTab,
         Other: OtherTab,
     },
     {

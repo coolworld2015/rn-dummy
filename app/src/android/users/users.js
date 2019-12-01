@@ -12,20 +12,17 @@ import {
     TextInput,
     Image,
     Dimensions,
-    RefreshControl,
-    DrawerLayoutAndroid
+    RefreshControl
 } from 'react-native';
 
 import ListView from 'deprecated-react-native-listview';
-
-import MenuDrawer from 'react-native-side-drawer';
 
 class Users extends Component {
     constructor(props) {
         super(props);
 
         let ds = new ListView.DataSource({
-            rowHasChanged: (r1, r2) => r1 !== r2,
+            rowHasChanged: (r1, r2) => r1 !== r2
         });
 
         this.state = {
@@ -36,8 +33,7 @@ class Users extends Component {
             recordsCount: 15,
             positionY: 0,
             searchQuery: '',
-            refreshing: false,
-            open: false
+            refreshing: false
         };
 
         this.getItems();
@@ -47,9 +43,9 @@ class Users extends Component {
         this.didFocusListener = this.props.navigation.addListener(
             'didFocus',
             () => {
-                this.refreshComponent();
-            },
-        );
+                this.refreshComponent()
+            }
+        )
     }
 
     refreshComponent() {
@@ -57,11 +53,11 @@ class Users extends Component {
             appConfig.users.refresh = false;
 
             this.setState({
-                showProgress: true,
+                showProgress: true
             });
 
             setTimeout(() => {
-                this.getItems();
+                this.getItems()
             }, 500);
         }
     }
@@ -75,35 +71,34 @@ class Users extends Component {
             searchQuery: '',
         });
 
-        //fetch(appConfig.url + 'api/users/get', {
-        fetch('http://dummy.restapiexample.com/api/v1/employees', {
+        fetch(appConfig.url + 'api/users/get', {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': appConfig.access_token,
-            },
+            }
         })
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(responseData.slice(0, 15)),
+                    dataSource: this.state.dataSource.cloneWithRows(responseData.sort(this.sort).slice(0, 15)),
                     resultsCount: responseData.length,
                     responseData: responseData,
                     filteredItems: responseData,
-                    refreshing: false,
-                });
+                    refreshing: false
+                })
             })
             .catch((error) => {
                 this.setState({
-                    serverError: true,
-                });
+                    serverError: true
+                })
             })
             .finally(() => {
                 this.setState({
-                    showProgress: false,
-                });
-            });
+                    showProgress: false
+                })
+            })
     }
 
     sort(a, b) {
@@ -122,6 +117,10 @@ class Users extends Component {
         this.props.navigation.navigate('UserDetails');
     }
 
+    addItem() {
+        this.props.navigation.navigate('UserAdd');
+    }
+
     renderRow(rowData) {
         return (
             <TouchableHighlight
@@ -129,11 +128,11 @@ class Users extends Component {
                 underlayColor='#ddd'>
                 <View style={styles.row}>
                     <Text style={styles.rowText}>
-                        {rowData.id} - {rowData.employee_name} - {rowData.employee_age} - {rowData.employee_salary}
+                        {rowData.name}
                     </Text>
                 </View>
             </TouchableHighlight>
-        );
+        )
     }
 
     refreshData(event) {
@@ -150,12 +149,12 @@ class Users extends Component {
         positionY = this.state.positionY;
         items = this.state.filteredItems.slice(0, recordsCount);
 
-        if (event.nativeEvent.contentOffset.y >= positionY - 100) {
+        if (event.nativeEvent.contentOffset.y >= positionY - 10) {
             this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(items),
                 recordsCount: recordsCount + 10,
-                positionY: positionY + 500,
-            });
+                positionY: positionY + 500
+            })
         }
     }
 
@@ -165,19 +164,19 @@ class Users extends Component {
         }
 
         let arr = [].concat(this.state.responseData);
-        let items = arr.filter((el) => el.employee_name.toLowerCase().indexOf(text.toLowerCase()) !== -1);
+        let items = arr.filter((el) => el.name.toLowerCase().indexOf(text.toLowerCase()) !== -1);
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(items),
             resultsCount: items.length,
             filteredItems: items,
-            searchQuery: text,
-        });
+            searchQuery: text
+        })
     }
 
     refreshDataAndroid() {
         this.setState({
             showProgress: true,
-            resultsCount: 0,
+            resultsCount: 0
         });
 
         this.getItems();
@@ -190,65 +189,12 @@ class Users extends Component {
             filteredItems: this.state.responseData,
             positionY: 0,
             recordsCount: 15,
-            searchQuery: '',
+            searchQuery: ''
         });
     }
 
     onMenu() {
-        this.setState({open: true});
-    }
-
-    menuClose() {
-        this.setState({open: false});
-    }
-
-    menuAddItem() {
-        this.setState({open: false});
-        this.addItem();
-    }
-
-    getItemsMenu() {
-        this.setState({
-            showProgress: true,
-            resultsCount: 0,
-        });
-        this.getItems();
-        this.setState({open: false});
-    }
-
-    drawerContent() {
-        return (
-            <View style={{flex: 1, backgroundColor: 'black', marginTop: 0}}>
-                <Text style={styles.layoutText} onPress={() => this.menuClose()}>
-                    Rest API Demo
-                </Text>
-
-                <TouchableHighlight
-                    onPress={() => this.getItemsMenu()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Reload
-                    </Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                    onPress={() => this.menuAddItem()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        New
-                    </Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                    onPress={() => this.menuClose()}
-                    style={styles.button}>
-                    <Text style={styles.buttonText}>
-                        Close
-                    </Text>
-                </TouchableHighlight>
-
-            </View>
-        );
+        //appConfig.drawer.openDrawer();
     }
 
     render() {
@@ -257,7 +203,7 @@ class Users extends Component {
         if (this.state.serverError) {
             errorCtrl = <Text style={styles.error}>
                 Something went wrong.
-            </Text>;
+            </Text>
         }
 
         if (this.state.showProgress) {
@@ -267,7 +213,7 @@ class Users extends Component {
                     color="darkblue"
                     animating={true}
                 />
-            </View>;
+            </View>
         }
 
         if (this.state.searchQuery.length > 0) {
@@ -278,96 +224,86 @@ class Users extends Component {
                     width: 20,
                     marginTop: 10,
                 }}
-            />;
+            />
         }
 
         return (
             <View style={styles.container}>
-                <View style={styles.container}>
-                    <MenuDrawer
-                        open={this.state.open}
-                        drawerContent={this.drawerContent()}
-                        drawerPercentage={50}
-                        animationTime={50}
-                        overlay={true}
-                        opacity={0.3}>
-
-                        <View style={styles.header}>
+                <View style={styles.header}>
+                    <View>
+                        <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
                             <View>
-                                <TouchableWithoutFeedback onPress={this.onMenu.bind(this)}>
-                                    <View>
-                                        <Image
-                                            style={styles.menu}
-                                            source={require('../../../img/menu.png')}
-                                        />
-                                    </View>
-                                </TouchableWithoutFeedback>
+                                <Image
+                                    style={styles.menu}
+                                    source={require('../../../img/menu.png')}
+                                />
                             </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                    <View>
+                        <TouchableWithoutFeedback>
                             <View>
-                                <TouchableWithoutFeedback>
-                                    <View>
-                                        <Text style={styles.textLarge}>
-                                            Rest API Demo
-                                        </Text>
-                                    </View>
-                                </TouchableWithoutFeedback>
+                                <Text style={styles.textLarge}>
+                                    Users
+                                </Text>
                             </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                    <View>
+                        <TouchableHighlight
+                            onPress={() => this.addItem()}
+                            underlayColor='darkblue'>
                             <View>
-                                <TouchableHighlight
-                                    onPress={() => this.addItem()}
-                                    underlayColor='darkblue'>
-                                    <View>
-                                        <Text style={styles.textSmall}>
-                                            New
-                                        </Text>
-                                    </View>
-                                </TouchableHighlight>
+                                <Text style={styles.textSmall}>
+                                    New
+                                </Text>
                             </View>
-                        </View>
-
-                        <View style={styles.iconForm}>
-                            <View>
-                                <TextInput
-                                    underlineColorAndroid='rgba(0,0,0,0)'
-                                    onChangeText={this.onChangeText.bind(this)}
-                                    style={styles.searchLarge}
-                                    value={this.state.searchQuery}
-                                    placeholderTextColor='gray'
-                                    placeholder='Search here'>
-                                </TextInput>
-                            </View>
-                            <View style={styles.searchSmall}>
-                                <TouchableWithoutFeedback
-                                    onPress={() => this.clearSearchQuery()}>
-                                    <View>
-                                        {image}
-                                    </View>
-                                </TouchableWithoutFeedback>
-                            </View>
-                        </View>
-
-                        {errorCtrl}
-
-                        {loader}
-
-                        <ScrollView
-                            onScroll={this.refreshData.bind(this)}
-                            scrollEventThrottle={16}
-                            refreshControl={
-                                <RefreshControl
-                                    enabled={true}
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this.refreshDataAndroid.bind(this)}/>
-                            }>
-                            <ListView
-                                style={styles.scroll}
-                                enableEmptySections={true}
-                                dataSource={this.state.dataSource}
-                                renderRow={this.renderRow.bind(this)}
-                            />
-                        </ScrollView>
-                    </MenuDrawer>
+                        </TouchableHighlight>
+                    </View>
                 </View>
+
+                <View style={styles.iconForm}>
+                    <View>
+                        <TextInput
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            onChangeText={this.onChangeText.bind(this)}
+                            style={styles.searchLarge}
+                            value={this.state.searchQuery}
+                            placeholderTextColor='gray'
+                            placeholder='Search here'>
+                        </TextInput>
+                    </View>
+                    <View style={styles.searchSmall}>
+                        <TouchableWithoutFeedback
+                            onPress={() => this.clearSearchQuery()}>
+                            <View>
+                                {image}
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </View>
+
+                {errorCtrl}
+
+                {loader}
+
+                <ScrollView
+                    onScroll={this.refreshData.bind(this)}
+                    scrollEventThrottle={16}
+                    refreshControl={
+                        <RefreshControl
+                            enabled={true}
+                            refreshing={this.state.refreshing}
+                            onRefresh={this.refreshDataAndroid.bind(this)}
+                        />
+                    }>
+                    <ListView
+                        style={styles.scroll}
+                        enableEmptySections={true}
+                        dataSource={this.state.dataSource}
+                        renderRow={this.renderRow.bind(this)}
+                    />
+                </ScrollView>
 
                 <View>
                     <TouchableWithoutFeedback
@@ -379,7 +315,6 @@ class Users extends Component {
                         </View>
                     </TouchableWithoutFeedback>
                 </View>
-
             </View>
         );
     }
@@ -389,19 +324,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: 'white',
+        backgroundColor: 'white'
     },
     iconForm: {
         flexDirection: 'row',
         borderColor: 'darkblue',
-        borderWidth: 4,
+        borderWidth: 4
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'darkblue',
-        marginTop: -4,
-        borderColor: 'white',
+        borderTopWidth: 1,
+        borderColor: 'white'
     },
     searchLarge: {
         height: 45,
@@ -411,7 +346,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderRadius: 0,
         color: 'black',
-        width: Dimensions.get('window').width * .90,
+        width: Dimensions.get('window').width * .90
     },
     searchSmall: {
         height: 45,
@@ -420,24 +355,23 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         marginLeft: -5,
         paddingLeft: 5,
-        width: Dimensions.get('window').width * .10,
+        width: Dimensions.get('window').width * .10
     },
     textSmall: {
         fontSize: 16,
         textAlign: 'center',
         margin: 14,
-        marginLeft: 0,
         fontWeight: 'bold',
-        color: 'white',
+        color: 'white'
     },
     textLarge: {
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
         marginTop: 12,
-        paddingLeft: 0,
+        paddingLeft: 10,
         fontWeight: 'bold',
-        color: 'white',
+        color: 'white'
     },
     textInput: {
         height: 45,
@@ -446,7 +380,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderWidth: 3,
         borderColor: 'lightgray',
-        borderRadius: 0,
+        borderRadius: 0
     },
     row: {
         flex: 1,
@@ -455,12 +389,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: '#D7D7D7',
         borderBottomWidth: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
     },
     rowText: {
         backgroundColor: '#fff',
         color: 'black',
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     countFooter: {
         fontSize: 16,
@@ -469,38 +403,22 @@ const styles = StyleSheet.create({
         borderColor: '#D7D7D7',
         backgroundColor: 'darkblue',
         color: 'white',
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     loader: {
         justifyContent: 'center',
-        height: 100,
+        height: 100
     },
     error: {
         color: 'red',
         paddingTop: 10,
-        textAlign: 'center',
+        textAlign: 'center'
     },
     menu: {
         alignItems: 'center',
         margin: 14,
-        marginTop: 16,
-    },
-    layoutText: {
-        color: 'white',
-        marginTop: 20,
-        fontWeight: 'bold',
-        fontSize: 15,
-        textAlign: 'center'
-    },
-    buttonText: {
-        fontSize: 20,
-        textAlign: 'center',
-        padding: 15,
-        marginTop: 20,
-        fontWeight: 'bold',
-        color: 'white',
-        backgroundColor: 'darkblue'
-    },
+        marginTop: 16
+    }
 });
 
 export default Users;
