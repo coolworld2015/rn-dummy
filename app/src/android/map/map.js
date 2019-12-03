@@ -60,12 +60,6 @@ class Map extends Component {
             showProgress: true,
             key: this.state.key + 1,
             locationsList: '',
-            locationsList1: `
-            ['Point1', 49.093086, 8.533068, 1],
-            ['Point2', 49.147995, 8.559998, 2],
-            ['Point3', 49.116544, 8.551161, 3],
-            ['Point4', 49.166744, 8.551161, 4],
-            ['Point5', 49.176844, 8.551161, 5]`
         });
 
         setTimeout(() => {
@@ -91,12 +85,65 @@ class Map extends Component {
 
     setData() {
         this.setState({open: false});
-        let locationsList = [['Point1', 49.093086, 8.533068, 1],
-            ['Point2', 49.147995, 8.559998, 2],
-            ['Point3', 49.116544, 8.551161, 3],
-            ['Point4', 49.166744, 8.551161, 4],
-            ['Point5', 49.176844, 8.551161, 5]];
-        this.webView.postMessage(JSON.stringify(locationsList));
+        fetch(appConfig.url + 'api/targets/get', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': appConfig.access_token
+            }
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.webView.postMessage('Set' + '####' + JSON.stringify(responseData));
+            })
+            .catch(() => {
+                this.setState({
+                    serverError: true
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    showProgress: false
+                });
+            });
+    }
+
+    drawVehicleRoutes(vehicle) {
+        this.setState({open: false});
+        fetch(appConfig.url + 'api/positions/get', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': appConfig.access_token
+            }
+        })
+            .then((response) => response.json())
+            .then(result => {
+                this.items = result;
+                let path = [];
+                let items = this.items.filter(item => item.vehicle === vehicle);
+                console.log(items)
+
+                items.forEach((item) => {
+                    let obj = {};
+                    obj.lat = parseFloat(item.lat);
+                    obj.lng = parseFloat(item.lng);
+                    path.push(obj)
+                });
+                this.webView.postMessage('Routes' + '####' + JSON.stringify(path));
+            })
+            .catch(() => {
+                this.setState({
+                    serverError: true
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    showProgress: false
+                });
+            });
     }
 
     menuClose() {
@@ -159,6 +206,13 @@ class Map extends Component {
         );
     }
 
+    handleMessage = (event) => {
+        console.log(event.nativeEvent.data);
+        if (event.nativeEvent.data.split('####')[0] === 'Draw') {
+            this.drawVehicleRoutes(event.nativeEvent.data.split('####')[1]);
+        }
+    };
+
     render() {
 
         var html = `
@@ -185,10 +239,22 @@ class Map extends Component {
 
 <script type="text/javascript">
     document.addEventListener("message", function(event) {
-        switch (event.data) {
+        switch (event.data.split('####')[0]) {
         case 'Draw' : showRoutes(); break;
         case 'Pos' : getPos(); break;
-        default: locations = JSON.parse(event.data); setData();
+        case 'Set' : locations = JSON.parse(event.data.split('####')[1]); setData(); break;
+        case 'Routes' : 
+            flightPath.setMap(null);
+            flightPath = new google.maps.Polyline({
+                path: JSON.parse(event.data.split('####')[1]),
+                geodesic: true,
+                strokeColor: '#01579B',
+                strokeOpacity: 1.0,
+                strokeWeight: 6
+            });
+            flightPath.setMap(map);
+            break;
+         default: locations = JSON.parse(event.data); setData(); break;   
         }
     }, false);
 
@@ -219,23 +285,16 @@ class Map extends Component {
     });      
     
     var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
-        center: new google.maps.LatLng(49.124966, 8.552490),
+        zoom: 11,
+        center: new google.maps.LatLng(50.4272102, 30.6206667),
         mapTypeId: google.maps.MapTypeId.ROADMAP
         //mapTypeId: google.maps.MapTypeId.SATELLITE
     });
-    
-     marker = new google.maps.Marker({
-        position: new google.maps.LatLng(49.124966, 8.552490),
+
+    marker = new google.maps.Marker({
+        position: new google.maps.LatLng(50.4272102, 30.6206667),
         draggable: true,
-        animation: google.maps.Animation.BOUNCE,
-        icon: symbolOne,
-        map: map
-    });    
-    
-     marker = new google.maps.Marker({
-        position: new google.maps.LatLng(49.124888, 8.552490),
-        draggable: true,
+        //animation: google.maps.Animation.BOUNCE,
         icon: image,
         map: map
     });
@@ -243,16 +302,18 @@ class Map extends Component {
     var infowindow = new google.maps.InfoWindow();
 
     function setData() {
+      window.ReactNativeWebView.postMessage('Set');
       for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
             map: map
         });
 
         google.maps.event.addListener(marker, 'click', (function (marker, i) {
             return function () {
-                infowindow.setContent(locations[i][0]);
+                infowindow.setContent(locations[i].vehicle);
                 infowindow.open(map, marker);
+                window.ReactNativeWebView.postMessage('Draw' + '####' + locations[i].vehicle);
             }
         })(marker, i));
         }
@@ -361,8 +422,9 @@ class Map extends Component {
                             backgroundColor: 'white'
                         }}
                         ref={( webView ) => this.webView = webView}
-                        onMessage={(event)=> console.log(event.nativeEvent.data)}
+                        onMessage={this.handleMessage}
                         geolocationEnabled={true}
+                        javaScriptEnabled={true}
                     />
                 </MenuDrawer>
             </View>

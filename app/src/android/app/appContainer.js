@@ -153,7 +153,8 @@ const tabBarOptions = {
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
-        Guests: GuestsTab,
+        Map: MapTab,
+        /*Guests: GuestsTab,*/
         Users: UsersTab,
         Demo: DummysTab,
         Other: OtherTab,

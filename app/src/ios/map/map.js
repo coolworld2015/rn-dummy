@@ -23,12 +23,6 @@ class Map extends Component {
             key: 0,
             showProgress: true,
             locationsList: '',
-            locationsList1: `
-            ["Point1", 49.093086, 8.533068, 1],
-            ["Point2", 49.147995, 8.559998, 2],
-            ["Point3", 49.116544, 8.551161, 3],
-            ["Point4", 49.166744, 8.551161, 4],
-            ["Point5", 49.176844, 8.551161, 5]`,
             position: '',
             open: false
         };
@@ -45,7 +39,6 @@ class Map extends Component {
                 console.log(position.coords);
             },
             (error) => {
-                // See error code charts below.
                 console.log(error.code, error.message);
             },
             {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000}
@@ -84,12 +77,6 @@ class Map extends Component {
             showProgress: true,
             key: this.state.key + 1,
             locationsList: '',
-            locationsList1: `
-            ['Point1', 49.093086, 8.533068, 1],
-            ['Point2', 49.147995, 8.559998, 2],
-            ['Point3', 49.116544, 8.551161, 3],
-            ['Point4', 49.166744, 8.551161, 4],
-            ['Point5', 49.176844, 8.551161, 5]`
         });
 
         let that = this;
@@ -322,7 +309,7 @@ class Map extends Component {
         //mapTypeId: google.maps.MapTypeId.SATELLITE
     });
 
-     marker = new google.maps.Marker({
+    marker = new google.maps.Marker({
         position: new google.maps.LatLng(50.4272102, 30.6206667),
         draggable: true,
         //animation: google.maps.Animation.BOUNCE,
