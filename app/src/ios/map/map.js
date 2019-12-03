@@ -50,13 +50,13 @@ class Map extends Component {
             },
             {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000}
         );
-
+        let that = this;
         setTimeout(() => {
             this.setState({
                 showProgress: false,
             });
-        }, 300);
-
+            that.setData();
+        }, 1000);
     }
 
     refreshData(event) {
@@ -75,7 +75,7 @@ class Map extends Component {
 
             setTimeout(() => {
                 this.mapReload();
-            }, 300);
+            }, 1000);
         }
     }
 
@@ -92,11 +92,13 @@ class Map extends Component {
             ['Point5', 49.176844, 8.551161, 5]`
         });
 
+        let that = this;
         setTimeout(() => {
             this.setState({
                 showProgress: false,
             });
-        }, 300);
+            that.setData();
+        }, 1000);
     }
 
     onMenu() {
@@ -105,12 +107,12 @@ class Map extends Component {
 
     drawLines() {
         this.setState({open: false});
-        this.webView.postMessage('Draw');
+        this.webView.postMessage('Draw' + '####');
     }
 
     getPos() {
         this.setState({open: false});
-        this.webView.postMessage('Pos');
+        this.webView.postMessage('Pos' + '####');
     }
 
     setData() {
@@ -125,7 +127,44 @@ class Map extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.webView.postMessage(JSON.stringify(responseData));
+                this.webView.postMessage('Set' + '####' + JSON.stringify(responseData));
+            })
+            .catch(() => {
+                this.setState({
+                    serverError: true
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    showProgress: false
+                });
+            });
+    }
+
+    drawVehicleRoutes(vehicle) {
+        this.setState({open: false});
+        fetch(appConfig.url + 'api/positions/get', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': appConfig.access_token
+            }
+        })
+            .then((response) => response.json())
+            .then(result => {
+                this.items = result;
+                let path = [];
+                let items = this.items.filter(item => item.vehicle === vehicle);
+                console.log(items)
+
+                items.forEach((item) => {
+                    let obj = {};
+                    obj.lat = parseFloat(item.lat);
+                    obj.lng = parseFloat(item.lng);
+                    path.push(obj)
+                });
+                this.webView.postMessage('Routes' + '####' + JSON.stringify(path));
             })
             .catch(() => {
                 this.setState({
@@ -200,6 +239,13 @@ class Map extends Component {
         );
     }
 
+    handleMessage = (event) => {
+        console.log(event.nativeEvent.data);
+        if (event.nativeEvent.data.split('####')[0] === 'Draw') {
+            this.drawVehicleRoutes(event.nativeEvent.data.split('####')[1]);
+        }
+    };
+
     render() {
 
         let html = `
@@ -227,10 +273,21 @@ class Map extends Component {
     //window.postMessage("Messga from webView");
     
     window.addEventListener("message", function(event) {
-        switch (event.data) {
+        switch (event.data.split('####')[0]) {
         case 'Draw' : showRoutes(); break;
         case 'Pos' : getPos(); break;
-        default: locations = JSON.parse(event.data); setData();
+        case 'Set' : locations = JSON.parse(event.data.split('####')[1]); setData(); break;
+        case 'Routes' : 
+            flightPath.setMap(null);
+            flightPath = new google.maps.Polyline({
+                path: JSON.parse(event.data.split('####')[1]),
+                geodesic: true,
+                strokeColor: '#01579B',
+                strokeOpacity: 1.0,
+                strokeWeight: 6
+            });
+            flightPath.setMap(map);
+            break;
         }
     }, false);
 
@@ -278,7 +335,7 @@ class Map extends Component {
     var infowindow = new google.maps.InfoWindow();
 
     function setData() {
-      window.ReactNativeWebView.postMessage("Message from webView");
+      window.ReactNativeWebView.postMessage('Set');
       for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
@@ -289,6 +346,7 @@ class Map extends Component {
             return function () {
                 infowindow.setContent(locations[i].vehicle);
                 infowindow.open(map, marker);
+                window.ReactNativeWebView.postMessage('Draw' + '####' + locations[i].vehicle);
             }
         })(marker, i));
         }
@@ -388,7 +446,7 @@ class Map extends Component {
                                 backgroundColor: 'white'
                             }}
                             ref={(webView) => this.webView = webView}
-                            onMessage={(event) => console.log(event.nativeEvent.data)}
+                            onMessage={this.handleMessage}
                             geolocationEnabled={true}
                             key={this.state.key}
                         />
