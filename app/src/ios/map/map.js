@@ -125,7 +125,6 @@ class Map extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                console.log(JSON.stringify(responseData));
                 this.webView.postMessage(JSON.stringify(responseData));
             })
             .catch(() => {
@@ -225,6 +224,8 @@ class Map extends Component {
 </div>
 
 <script type="text/javascript">
+    //window.postMessage("Messga from webView");
+    
     window.addEventListener("message", function(event) {
         switch (event.data) {
         case 'Draw' : showRoutes(); break;
@@ -277,6 +278,7 @@ class Map extends Component {
     var infowindow = new google.maps.InfoWindow();
 
     function setData() {
+      window.ReactNativeWebView.postMessage("Message from webView");
       for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
