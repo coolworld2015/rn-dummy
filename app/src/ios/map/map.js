@@ -56,7 +56,7 @@ class Map extends Component {
                 showProgress: false,
             });
             that.setData();
-        }, 1000);
+        }, 2000);
     }
 
     refreshData(event) {
@@ -270,8 +270,6 @@ class Map extends Component {
 </div>
 
 <script type="text/javascript">
-    //window.postMessage("Messga from webView");
-    
     window.addEventListener("message", function(event) {
         switch (event.data.split('####')[0]) {
         case 'Draw' : showRoutes(); break;
