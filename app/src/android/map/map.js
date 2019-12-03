@@ -28,11 +28,13 @@ class Map extends Component {
     }
 
     componentDidMount() {
+        let that = this;
         setTimeout(() => {
             this.setState({
                 showProgress: false,
             });
-        }, 1000);
+            that.setData();
+        }, 2000);
     }
 
     refreshData(event) {
@@ -62,10 +64,12 @@ class Map extends Component {
             locationsList: '',
         });
 
+        let that = this;
         setTimeout(() => {
             this.setState({
                 showProgress: false,
             });
+            that.setData();
         }, 1000);
     }
 
@@ -447,8 +451,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'darkblue',
-        //borderTopWidth: 1,
         borderColor: 'white',
+        marginTop: -3,
     },
     searchLarge: {
         height: 45,
