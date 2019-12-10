@@ -119,7 +119,11 @@ class Dummys extends Component {
 
     showDetails(rowData) {
         appConfig.item = rowData;
-        this.props.navigation.navigate('UserDetails');
+        this.props.navigation.navigate('DummyDetails');
+    }
+
+    addItem() {
+        this.props.navigation.navigate('DummyAdd');
     }
 
     renderRow(rowData) {
