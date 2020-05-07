@@ -10,6 +10,7 @@ console.disableYellowBox = true;
 
 import Login from './login';
 import DriverReg from '../yard/driverReg';
+import SheriffReg from '../sheriff/login';
 import AppContainer from './appContainer';
 
 class App extends Component {
@@ -18,7 +19,7 @@ class App extends Component {
 
         this.state = {
             showProgress: true,
-            isLoggedIn: true,
+            isLoggedIn: false,
         };
 
         window.appConfig = {
@@ -94,7 +95,7 @@ class App extends Component {
 
             } else {
                 return (
-                    <DriverReg/>
+                    <SheriffReg/>
                 );
             }
         } else {
