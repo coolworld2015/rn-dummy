@@ -174,7 +174,7 @@ class Map extends Component {
                     </Text>
                 </TouchableHighlight>
 
-                <TouchableHighlight
+{/*                <TouchableHighlight
                     onPress={() => this.setData()}
                     style={styles.button}>
                     <Text style={styles.buttonText}>
@@ -188,7 +188,7 @@ class Map extends Component {
                     <Text style={styles.buttonText}>
                         Draw lines
                     </Text>
-                </TouchableHighlight>
+                </TouchableHighlight>*/}
 
                 <TouchableHighlight
                     onPress={() => this.getPos()}

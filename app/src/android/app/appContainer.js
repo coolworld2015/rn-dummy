@@ -172,6 +172,7 @@ const TabNavigator = createMaterialTopTabNavigator({
         Audit: AuditTab,
         Map: Map,
         Chat: ChatTab,
+        Quit: Logout
     },
     {
         tabBarPosition: 'top',
