@@ -12,6 +12,9 @@ import Users from '../users/users';
 import UserDetails from '../users/userDetails';
 import UserAdd from '../users/userAdd';
 
+import Audit from '../audit/audit';
+import AuditDetails from '../audit/auditDetails';
+
 import Dummys from '../dummys/dummys';
 import DummyDetails from '../dummys/dummyDetails';
 import DummyAdd from '../dummys/dummyAdd';
@@ -42,6 +45,19 @@ const OtherTab = createStackNavigator({
 
 const DriverTab = createStackNavigator({
         Driver,
+    }, {
+        headerMode: 'none',
+        transitionConfig: () => ({
+            screenInterpolator: sceneProps => {
+                return StackViewStyleInterpolator.forHorizontal(sceneProps);
+            },
+        }),
+    },
+);
+
+const AuditTab = createStackNavigator({
+        Audit,
+        AuditDetails
     }, {
         headerMode: 'none',
         transitionConfig: () => ({
@@ -153,10 +169,9 @@ const tabBarOptions = {
 };
 
 const TabNavigator = createMaterialTopTabNavigator({
-        Guests: GuestsTab,
-        Users: UsersTab,
-        Demo: DummysTab,
-        Other: OtherTab,
+        Audit: AuditTab,
+        Map: Map,
+        Chat: ChatTab,
     },
     {
         tabBarPosition: 'top',
